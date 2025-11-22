@@ -254,17 +254,17 @@ export default function DailyChallenge() {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center pt-8"
           >
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 mb-6">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 mb-3">
                 {view === "COMPLETED" ? <Trophy className="w-8 h-8 text-yellow-500" /> : <Clock className="w-8 h-8 text-blue-500" />}
             </div>
 
             <h2 className="text-2xl font-bold text-white mb-2">
                 {view === "COMPLETED" ? "Session Complete" : "You've played today"}
             </h2>
-            <p className="text-zinc-400 mb-8 max-w-xs mx-auto leading-relaxed">
+            <p className="text-zinc-400 mb-3 max-w-xs mx-auto leading-relaxed">
                 {view === "COMPLETED" 
                     ? "Great work. Your stats have been recorded." 
-                    : "Daily protocols reset at midnight. Come back tomorrow for a new set of questions."}
+                    : "Daily Quiz reset at midnight. Come back tomorrow for a new set of questions."}
             </p>
 
             <div 
