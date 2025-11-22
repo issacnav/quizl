@@ -116,40 +116,34 @@ export default function DailyChallenge() {
 
 
 
-  // 2. Fetch Leaderboard (Mock or Real)
-
+  // 2. Fetch Real Leaderboard
   useEffect(() => {
-
     async function fetchLeaderboard() {
-
-      const { data, error } = await supabase
-
+      const { data } = await supabase
         .from('leaderboard')
-
         .select('*')
-
         .order('score', { ascending: false })
+        .limit(20); // Top 20
 
-        .order('created_at', { ascending: false })
-
-        .limit(100);
-
-
-
-      if (data && !error) {
-
+      if (data) {
         setLeaderboard(data);
-
-      } else {
-
-        console.error("Error fetching leaderboard:", error);
-
       }
-
     }
-
+    
+    // Fetch immediately
     fetchLeaderboard();
 
+    // Real-time subscription (Optional: updates list if someone else plays while you watch)
+    const channel = supabase
+      .channel('leaderboard_updates')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'leaderboard' }, (payload) => {
+        setLeaderboard((prev) => [...prev, payload.new].sort((a, b) => b.score - a.score).slice(0, 20));
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
 
@@ -209,69 +203,28 @@ export default function DailyChallenge() {
 
 
   // 4. Submit to Leaderboard
-
   const handleJoinLeaderboard = async () => {
-
     if (!userName) return;
-
     
-
-    // Save to Supabase
-
+    // 1. Save to Supabase
     const today = new Date().toISOString().split('T')[0];
-
-    const { error } = await supabase.from('leaderboard').insert({ 
-
-      username: userName.trim(), 
-
-      score: score,
-
-      date: today 
-
-    });
-
-
+    const { error } = await supabase
+        .from('leaderboard')
+        .insert({ username: userName, score: score, date: today });
 
     if (error) {
-
-      console.error("Error saving to leaderboard:", error);
-
-      alert("Failed to save your score. Please try again.");
-
-      return;
-
+        console.error(error);
+        alert(`Error saving score: ${error.message}`);
+        return;
     }
 
-
-
-    // Refresh leaderboard
-
-    const { data, error: fetchError } = await supabase
-
-      .from('leaderboard')
-
-      .select('*')
-
-      .order('score', { ascending: false })
-
-      .order('created_at', { ascending: false })
-
-      .limit(100);
-
-
-
-    if (data && !fetchError) {
-
-      setLeaderboard(data);
-
-    }
-
+    // 2. Refresh local list (The subscription above will handles this, 
+    // but we can manually add it to be instant for the user)
+    const newEntry = { username: userName, score: score };
+    setLeaderboard((prev) => [...prev, newEntry].sort((a: any, b: any) => b.score - a.score));
     
-
     setShowNameModal(false);
-
     setView("LEADERBOARD");
-
   };
 
 

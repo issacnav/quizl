@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PhysioFlow",
-  description: "Physiotherapy support and daily quiz platform",
+  title: "PhysioFlow | Daily Clinical Challenge",
+  description: "Test your physiotherapy knowledge with daily interactive quizzes.",
 };
 
 export default function RootLayout({
