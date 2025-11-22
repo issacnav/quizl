@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, X, Trophy, ArrowRight, Loader2, Clock } from "lucide-react";
+import { Check, X, Trophy, ArrowRight, Loader2, Clock, Activity } from "lucide-react";
 import Lottie from "lottie-react";
 import hiAnimation from "@/components/Hi.json";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,12 @@ import { supabase } from "@/utils/supabase";
 
 // --- Types ---
 type ViewState = "LOADING" | "QUIZ" | "COMPLETED" | "LEADERBOARD" | "ALREADY_PLAYED";
+
+// The "Linear" Blur-In Effect
+const blurIn = {
+  hidden: { filter: "blur(10px)", opacity: 0, y: -20 },
+  visible: { filter: "blur(0px)", opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" as const } },
+};
 
 interface Option {
   id: string;
@@ -175,8 +181,33 @@ export default function DailyChallenge() {
   };
 
   return (
-    <main className="w-full max-w-lg px-4 relative flex flex-col justify-center mx-auto min-h-[80vh]">
+    <main className="w-full max-w-lg px-4 relative flex flex-col justify-center mx-auto min-h-screen pt-32">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+
+      {/* --- SITE HEADER (Only on first question) --- */}
+      <AnimatePresence>
+        {currentIndex === 0 && view === "QUIZ" && (
+          <motion.div 
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+            variants={blurIn}
+            className="absolute top-16 left-0 right-0 flex flex-col items-center z-50"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              {/* Text with Linear Gradient */}
+              <h1 className="text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40">
+                PhysioQuiz
+              </h1>
+            </div>
+            
+            {/* Subtitle tag */}
+            <div className="px-4 py-1 rounded-full border border-white/5 bg-white/5 text-2xs font-medium text-zinc-400 tracking-widest uppercase">
+              Test Your Knowledge
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence mode="wait">
         
