@@ -12,6 +12,8 @@ import { Card } from "@/components/ui/card";
 
 import { Plus, Save, CheckCircle2 } from "lucide-react";
 
+import { supabase } from "@/lib/supabase";
+
 
 
 export default function AdminPanel() {
@@ -80,33 +82,105 @@ export default function AdminPanel() {
 
     try {
 
-      // In a real app, you would send this to your API/backend
+      // Get today's date in YYYY-MM-DD format
 
-      const quizData = {
-
-        question: question.trim(),
-
-        options: options.map((opt, index) => ({
-
-          id: String.fromCharCode(65 + index).toLowerCase(),
-
-          text: opt.trim(),
-
-        })),
-
-        correctId: String.fromCharCode(65 + correctOption).toLowerCase(),
-
-      };
+      const today = new Date().toISOString().split('T')[0];
 
 
 
-      // Simulate API call
+      // Format options as JSON for Supabase
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const optionsJson = options.map((opt, index) => ({
 
-      
+        id: String.fromCharCode(97 + index), // a, b, c, d
 
-      console.log("Quiz published:", quizData);
+        text: opt.trim(),
+
+      }));
+
+
+
+      const correctId = String.fromCharCode(97 + correctOption); // a, b, c, or d
+
+
+
+      // Insert into Supabase daily_quiz table
+
+      const { data, error: insertError } = await supabase
+
+        .from('daily_quiz')
+
+        .insert({
+
+          question: question.trim(),
+
+          options_json: optionsJson,
+
+          correct_id: correctId,
+
+          date: today,
+
+        })
+
+        .select()
+
+        .single();
+
+
+
+      if (insertError) {
+
+        console.error("Error inserting quiz:", insertError);
+
+        
+
+        // Check if it's a unique constraint violation (quiz already exists for today)
+
+        if (insertError.code === '23505') {
+
+          // Try to update instead
+
+          const { error: updateError } = await supabase
+
+            .from('daily_quiz')
+
+            .update({
+
+              question: question.trim(),
+
+              options_json: optionsJson,
+
+              correct_id: correctId,
+
+            })
+
+            .eq('date', today);
+
+
+
+          if (updateError) {
+
+            console.error("Error updating quiz:", updateError);
+
+            alert("Failed to publish quiz. A quiz already exists for today and the update failed. Please try again.");
+
+            return;
+
+          }
+
+        } else {
+
+          alert("Failed to publish quiz. Please try again.");
+
+          return;
+
+        }
+
+      }
+
+
+
+      console.log("Quiz published successfully:", data);
 
       
 

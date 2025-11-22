@@ -4,117 +4,269 @@ import { useState, useEffect } from "react";
 
 import { motion, AnimatePresence } from "framer-motion";
 
-import { Check, Trophy, ArrowRight, Activity, User } from "lucide-react";
+import { Check, X, Trophy, ArrowRight, Activity, User, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 import { Input } from "@/components/ui/input";
 
-import { Card } from "@/components/ui/card";
-
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+
+import { supabase } from "@/utils/supabase";
 
 
 
 // --- Types ---
 
-type QuizState = "QUIZ" | "SCORE" | "LEADERBOARD";
+type ViewState = "LOADING" | "QUIZ" | "COMPLETED" | "LEADERBOARD";
 
 
 
-// --- Mock Data (In real app, fetch from DB) ---
+interface Option {
 
-const MOCK_QUIZ = {
+  id: string;
 
-  id: 1,
+  text: string;
 
-  question: "A patient presents with limited dorsiflexion. Which mobilization technique is most appropriate?",
-
-  options: [
-
-    { id: "a", text: "Posterior Talar Glide" },
-
-    { id: "b", text: "Anterior Talar Glide" }, // Correct
-
-    { id: "c", text: "Distal Tibiofibular Glide" },
-
-    { id: "d", text: "Subtalar Lateral Glide" },
-
-  ],
-
-  correctId: "a", // Posterior glide increases dorsiflexion
-
-};
+}
 
 
 
-const MOCK_LEADERBOARD = [
+interface QuizQuestion {
 
-  { name: "Sarah Physio", score: 980, time: "12s" },
+  id: number;
 
-  { name: "Mike Recovery", score: 950, time: "15s" },
+  question: string;
 
-  { name: "Dr. J", score: 890, time: "18s" },
+  options_json: Option[];
 
-];
+  correct_id: string;
+
+}
 
 
 
 export default function DailyChallenge() {
 
-  const [view, setView] = useState<QuizState>("QUIZ");
+  // App State
+
+  const [view, setView] = useState<ViewState>("LOADING");
+
+  const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+
+  
+
+  // Quiz Logic State
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [score, setScore] = useState(0);
 
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
 
+  
+
+  // Leaderboard State
+
   const [showNameModal, setShowNameModal] = useState(false);
 
   const [userName, setUserName] = useState("");
 
-  
-
-  // Animation variants
-
-  const containerVariants = {
-
-    hidden: { opacity: 0, y: 20 },
-
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
-
-    exit: { opacity: 0, y: -20, transition: { duration: 0.3 } }
-
-  };
+  const [leaderboard, setLeaderboard] = useState<any[]>([]);
 
 
 
-  const handleAnswer = (id: string) => {
+  // 1. Fetch Questions on Load
 
-    setSelectedOption(id);
+  useEffect(() => {
 
-    const correct = id === MOCK_QUIZ.correctId;
+    async function fetchQuiz() {
 
-    setIsCorrect(correct);
+      // Get all questions ordered by date or ID
+
+      const { data, error } = await supabase
+
+        .from('daily_quiz')
+
+        .select('*')
+
+        .order('id', { ascending: true });
+
+
+
+      if (data && !error) {
+
+        setQuestions(data);
+
+        setView("QUIZ");
+
+      } else {
+
+        console.error("Error fetching quiz:", error);
+
+      }
+
+    }
+
+    fetchQuiz();
+
+  }, []);
+
+
+
+  // 2. Fetch Leaderboard (Mock or Real)
+
+  useEffect(() => {
+
+    async function fetchLeaderboard() {
+
+      const { data, error } = await supabase
+
+        .from('leaderboard')
+
+        .select('*')
+
+        .order('score', { ascending: false })
+
+        .order('created_at', { ascending: false })
+
+        .limit(100);
+
+
+
+      if (data && !error) {
+
+        setLeaderboard(data);
+
+      } else {
+
+        console.error("Error fetching leaderboard:", error);
+
+      }
+
+    }
+
+    fetchLeaderboard();
+
+  }, []);
+
+
+
+  // 3. Handle Answering a Question
+
+  const handleAnswer = (optionId: string) => {
+
+    if (selectedOption) return; // Prevent double clicks
 
     
 
-    // Delay to show result then move to score
+    const currentQuestion = questions[currentIndex];
+
+    const correct = optionId === currentQuestion.correct_id;
+
+    
+
+    setSelectedOption(optionId);
+
+    setIsCorrect(correct);
+
+
+
+    if (correct) setScore((prev) => prev + 1000);
+
+
+
+    // Wait 1.5s then go to next question or finish
 
     setTimeout(() => {
 
-      setView("SCORE");
+      if (currentIndex < questions.length - 1) {
 
-      setTimeout(() => setShowNameModal(true), 500); // Trigger popup shortly after score
+        // Next Question
 
-    }, 1200);
+        setCurrentIndex((prev) => prev + 1);
+
+        setSelectedOption(null);
+
+        setIsCorrect(null);
+
+      } else {
+
+        // Finish Quiz
+
+        setView("COMPLETED");
+
+        setTimeout(() => setShowNameModal(true), 800);
+
+      }
+
+    }, 1500);
 
   };
 
 
 
-  const handleJoinLeaderboard = () => {
+  // 4. Submit to Leaderboard
+
+  const handleJoinLeaderboard = async () => {
 
     if (!userName) return;
+
+    
+
+    // Save to Supabase
+
+    const today = new Date().toISOString().split('T')[0];
+
+    const { error } = await supabase.from('leaderboard').insert({ 
+
+      username: userName.trim(), 
+
+      score: score,
+
+      date: today 
+
+    });
+
+
+
+    if (error) {
+
+      console.error("Error saving to leaderboard:", error);
+
+      alert("Failed to save your score. Please try again.");
+
+      return;
+
+    }
+
+
+
+    // Refresh leaderboard
+
+    const { data, error: fetchError } = await supabase
+
+      .from('leaderboard')
+
+      .select('*')
+
+      .order('score', { ascending: false })
+
+      .order('created_at', { ascending: false })
+
+      .limit(100);
+
+
+
+    if (data && !fetchError) {
+
+      setLeaderboard(data);
+
+    }
+
+    
 
     setShowNameModal(false);
 
@@ -124,13 +276,45 @@ export default function DailyChallenge() {
 
 
 
+  // Animation Variants
+
+  const slideVariants = {
+
+    hidden: { x: 50, opacity: 0 },
+
+    visible: { x: 0, opacity: 1 },
+
+    exit: { x: -50, opacity: 0 }
+
+  };
+
+
+
+  const currentQ = questions[currentIndex];
+
+
+
   return (
 
-    <main className="w-full max-w-lg px-4 relative">
+    <main className="w-full max-w-lg px-4 relative min-h-[600px] flex flex-col justify-center">
 
-      {/* Background Ambient Effect */}
+      {/* Ambient Background */}
 
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+
+
+
+      {view === "LOADING" && (
+
+        <div className="flex flex-col items-center justify-center text-zinc-500 gap-4">
+
+          <Loader2 className="w-8 h-8 animate-spin" />
+
+          <p>Loading Protocol...</p>
+
+        </div>
+
+      )}
 
 
 
@@ -138,15 +322,15 @@ export default function DailyChallenge() {
 
         
 
-        {/* VIEW 1: THE QUIZ */}
+        {/* --- VIEW: QUIZ --- */}
 
-        {view === "QUIZ" && (
+        {view === "QUIZ" && currentQ && (
 
           <motion.div
 
-            key="quiz"
+            key={currentQ.id} // Key change triggers animation
 
-            variants={containerVariants}
+            variants={slideVariants}
 
             initial="hidden"
 
@@ -154,73 +338,119 @@ export default function DailyChallenge() {
 
             exit="exit"
 
+            transition={{ duration: 0.3 }}
+
           >
 
-            <div className="mb-6 text-center">
+            {/* Progress Bar */}
 
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono text-zinc-400 mb-4">
+            <div className="flex items-center justify-between mb-6 text-xs font-mono text-zinc-500">
 
-                <Activity className="w-3 h-3 text-green-500" />
+              <div className="flex gap-1">
 
-                <span>DAILY CHALLENGE #124</span>
+                 <span>QUESTION {currentIndex + 1}</span>
+
+                 <span className="text-zinc-700">/</span>
+
+                 <span>{questions.length}</span>
 
               </div>
 
-              <h2 className="text-2xl font-medium leading-tight text-white">
-
-                {MOCK_QUIZ.question}
-
-              </h2>
+              <div className="text-blue-400">SCORE: {score}</div>
 
             </div>
+
+
+
+            {/* Progress Line */}
+
+            <div className="w-full h-1 bg-zinc-800 rounded-full mb-8 overflow-hidden">
+
+              <motion.div 
+
+                className="h-full bg-blue-500"
+
+                initial={{ width: `${((currentIndex) / questions.length) * 100}%` }}
+
+                animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
+
+              />
+
+            </div>
+
+
+
+            <h2 className="text-xl md:text-2xl font-medium leading-tight text-white mb-8">
+
+              {currentQ.question}
+
+            </h2>
 
 
 
             <div className="space-y-3">
 
-              {MOCK_QUIZ.options.map((opt) => (
+              {currentQ.options_json.map((opt) => {
 
-                <motion.button
+                const isSelected = selectedOption === opt.id;
 
-                  key={opt.id}
+                const isTheCorrectAnswer = opt.id === currentQ.correct_id;
 
-                  whileHover={{ scale: 1.01, backgroundColor: "rgba(255,255,255,0.08)" }}
+                
 
-                  whileTap={{ scale: 0.98 }}
+                // Dynamic Styles logic
 
-                  onClick={() => !selectedOption && handleAnswer(opt.id)}
+                let styleClass = "bg-zinc-900/40 border-white/10 hover:border-white/20 text-zinc-300"; // Default
 
-                  className={`
+                
 
-                    w-full p-5 rounded-xl text-left border transition-all duration-200 flex justify-between items-center
+                if (selectedOption) {
 
-                    ${selectedOption === opt.id 
+                  if (isSelected && isTheCorrectAnswer) {
 
-                      ? opt.id === MOCK_QUIZ.correctId 
+                    styleClass = "bg-green-500/10 border-green-500/50 text-green-100";
 
-                        ? "bg-green-500/10 border-green-500/50 text-green-100" 
+                  } else if (isSelected && !isTheCorrectAnswer) {
 
-                        : "bg-red-500/10 border-red-500/50 text-red-100"
+                    styleClass = "bg-red-500/10 border-red-500/50 text-red-100";
 
-                      : "bg-zinc-900/40 border-white/10 hover:border-white/20 text-zinc-300"
+                  } else if (!isSelected && isTheCorrectAnswer) {
 
-                    }
+                    styleClass = "bg-green-500/5 border-green-500/30 text-green-200/50"; // Show correct answer even if wrong
 
-                  `}
+                  } else {
 
-                >
+                    styleClass = "opacity-50 border-transparent"; // Dim others
 
-                  <span className="text-sm font-medium">{opt.text}</span>
+                  }
 
-                  {selectedOption === opt.id && (
+                }
 
-                    opt.id === MOCK_QUIZ.correctId ? <Check className="w-4 h-4" /> : <div className="w-2 h-2 rounded-full bg-red-500" />
 
-                  )}
 
-                </motion.button>
+                return (
 
-              ))}
+                  <button
+
+                    key={opt.id}
+
+                    disabled={!!selectedOption}
+
+                    onClick={() => handleAnswer(opt.id)}
+
+                    className={`w-full p-5 rounded-xl text-left border transition-all duration-200 flex justify-between items-center ${styleClass}`}
+
+                  >
+
+                    <span className="text-sm font-medium">{opt.text}</span>
+
+                    {isSelected && (isTheCorrectAnswer ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />)}
+
+                  </button>
+
+                );
+
+              })}
 
             </div>
 
@@ -230,53 +460,43 @@ export default function DailyChallenge() {
 
 
 
-        {/* VIEW 2: SCORE / TRANSITION */}
+        {/* --- VIEW: COMPLETED --- */}
 
-        {view === "SCORE" && (
+        {view === "COMPLETED" && (
 
           <motion.div
 
-            key="score"
+            key="completed"
 
-            variants={containerVariants}
+            initial={{ scale: 0.9, opacity: 0 }}
 
-            initial="hidden"
-
-            animate="visible"
-
-            exit="exit"
+            animate={{ scale: 1, opacity: 1 }}
 
             className="text-center pt-10"
 
           >
 
-            <motion.div 
-
-              initial={{ scale: 0.8, opacity: 0 }}
-
-              animate={{ scale: 1, opacity: 1 }}
-
-              className="w-24 h-24 mx-auto bg-gradient-to-b from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-[0_0_40px_-10px_rgba(74,222,128,0.5)]"
-
-            >
+            <div className="w-24 h-24 mx-auto bg-gradient-to-b from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center shadow-[0_0_40px_-10px_rgba(234,179,8,0.5)] mb-8">
 
               <Trophy className="w-10 h-10 text-black" />
 
-            </motion.div>
+            </div>
 
             
 
-            <h1 className="mt-8 text-4xl font-bold text-white glow-text">
+            <h1 className="text-4xl font-bold text-white mb-2">Session Complete</h1>
 
-              {isCorrect ? "Perfect Score" : "Nice Try"}
+            <p className="text-zinc-400 mb-8">You have completed today's protocol.</p>
 
-            </h1>
+            
 
-            <p className="text-zinc-400 mt-2">
+            <div className="inline-block p-6 rounded-2xl bg-zinc-900 border border-zinc-800">
 
-              {isCorrect ? "+1000 pts" : "+200 pts for participation"}
+              <div className="text-sm text-zinc-500 uppercase tracking-widest mb-1">Final Score</div>
 
-            </p>
+              <div className="text-5xl font-mono font-bold text-white">{score}</div>
+
+            </div>
 
           </motion.div>
 
@@ -284,7 +504,7 @@ export default function DailyChallenge() {
 
 
 
-        {/* VIEW 3: LEADERBOARD */}
+        {/* --- VIEW: LEADERBOARD --- */}
 
         {view === "LEADERBOARD" && (
 
@@ -292,37 +512,35 @@ export default function DailyChallenge() {
 
             key="leaderboard"
 
-            variants={containerVariants}
+            initial={{ opacity: 0, y: 20 }}
 
-            initial="hidden"
+            animate={{ opacity: 1, y: 0 }}
 
-            animate="visible"
-
-            className="glass-card rounded-2xl overflow-hidden"
+            className="bg-zinc-900/40 backdrop-blur-xl border border-white/10 shadow-2xl rounded-2xl overflow-hidden"
 
           >
 
             <div className="p-6 border-b border-white/10 bg-white/5 flex justify-between items-center">
 
-              <h3 className="font-semibold text-white">Global Rankings</h3>
+              <h3 className="font-semibold text-white">PhysioFlow Rankings</h3>
 
-              <span className="text-xs text-zinc-500 font-mono">TOP 100</span>
+              <span className="text-xs text-zinc-500 font-mono">GLOBAL</span>
 
             </div>
 
             
 
-            <div className="p-2">
+            <div className="p-2 max-h-[400px] overflow-y-auto">
 
-              {/* Current User (You) */}
+               {/* Header for user */}
 
-              <div className="flex items-center justify-between p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg mb-4 mx-2">
+               <div className="flex items-center justify-between p-4 bg-blue-500/10 border border-blue-500/20 rounded-lg mb-4 mx-2">
 
                 <div className="flex items-center gap-3">
 
                   <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold text-white">
 
-                    {userName.charAt(0)}
+                    {userName.charAt(0).toUpperCase()}
 
                   </div>
 
@@ -330,35 +548,65 @@ export default function DailyChallenge() {
 
                 </div>
 
-                <span className="font-mono text-blue-200">{isCorrect ? "1000" : "200"} pts</span>
+                <span className="font-mono text-blue-200 font-bold">{score} pts</span>
 
               </div>
 
 
 
-              {/* Public List */}
+              {leaderboard.map((user, i) => (
 
-              <div className="space-y-1">
+                <div key={user.id || i} className="flex items-center justify-between p-3 hover:bg-white/5 rounded-lg transition-colors px-4">
 
-                {MOCK_LEADERBOARD.map((user, i) => (
+                  <div className="flex items-center gap-4">
 
-                  <div key={i} className="flex items-center justify-between p-3 hover:bg-white/5 rounded-lg transition-colors px-4">
+                    <span className={`text-xs font-mono w-4 ${i < 3 ? 'text-yellow-500' : 'text-zinc-600'}`}>
 
-                    <div className="flex items-center gap-4">
+                      {i + 1}
 
-                      <span className="text-xs font-mono text-zinc-500 w-4">0{i + 1}</span>
+                    </span>
 
-                      <span className="text-sm text-zinc-300">{user.name}</span>
-
-                    </div>
-
-                    <span className="text-xs font-mono text-zinc-500">{user.score} pts</span>
+                    <span className="text-sm text-zinc-300">{user.username || user.name}</span>
 
                   </div>
 
-                ))}
+                  <span className="text-xs font-mono text-zinc-500">{user.score} pts</span>
 
-              </div>
+                </div>
+
+              ))}
+
+            </div>
+
+            
+
+            <div className="p-4 border-t border-white/10 text-center">
+
+               <Button 
+
+                 variant="ghost" 
+
+                 onClick={() => {
+
+                    setCurrentIndex(0); 
+
+                    setScore(0); 
+
+                    setView("QUIZ");
+
+                    setSelectedOption(null);
+
+                    setIsCorrect(null);
+
+                 }}
+
+                 className="text-xs text-zinc-500 hover:text-white"
+
+               >
+
+                 Restart Challenge
+
+               </Button>
 
             </div>
 
@@ -370,7 +618,7 @@ export default function DailyChallenge() {
 
 
 
-      {/* NAME INPUT POPUP */}
+      {/* NAME INPUT DIALOG */}
 
       <Dialog open={showNameModal} onOpenChange={setShowNameModal}>
 
@@ -378,7 +626,7 @@ export default function DailyChallenge() {
 
           <DialogHeader>
 
-            <DialogTitle className="text-center text-xl">Claim your spot</DialogTitle>
+            <DialogTitle className="text-center text-xl text-white">Save your progress</DialogTitle>
 
           </DialogHeader>
 
@@ -392,7 +640,7 @@ export default function DailyChallenge() {
 
                 placeholder="Enter your name" 
 
-                className="pl-9 bg-zinc-900 border-white/10 focus-visible:ring-white/20"
+                className="pl-9 bg-zinc-900 border-white/10 focus-visible:ring-blue-500/50 text-white"
 
                 value={userName}
 
@@ -404,19 +652,19 @@ export default function DailyChallenge() {
 
             </div>
 
-            <Button onClick={handleJoinLeaderboard} className="w-full bg-white text-black hover:bg-zinc-200">
+            <Button onClick={handleJoinLeaderboard} className="w-full bg-white text-black hover:bg-zinc-200 font-semibold">
 
-              View Leaderboard <ArrowRight className="w-4 h-4 ml-2" />
+              Submit Score <ArrowRight className="w-4 h-4 ml-2" />
 
             </Button>
 
-        </div>
+          </div>
 
         </DialogContent>
 
       </Dialog>
 
-      </main>
+    </main>
 
   );
 
