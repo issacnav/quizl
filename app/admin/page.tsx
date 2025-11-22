@@ -10,11 +10,151 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { Card } from "@/components/ui/card";
 
-import { Plus, Save } from "lucide-react";
+import { Plus, Save, CheckCircle2 } from "lucide-react";
 
 
 
 export default function AdminPanel() {
+
+  const [question, setQuestion] = useState("");
+
+  const [options, setOptions] = useState(["", "", "", ""]);
+
+  const [correctOption, setCorrectOption] = useState<number | null>(null);
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [isSuccess, setIsSuccess] = useState(false);
+
+
+
+  const handleOptionChange = (index: number, value: string) => {
+
+    const newOptions = [...options];
+
+    newOptions[index] = value;
+
+    setOptions(newOptions);
+
+  };
+
+
+
+  const handleSubmit = async (e: React.FormEvent) => {
+
+    e.preventDefault();
+
+    
+
+    // Validation
+
+    if (!question.trim()) {
+
+      alert("Please enter a question");
+
+      return;
+
+    }
+
+    if (options.some(opt => !opt.trim())) {
+
+      alert("Please fill in all options");
+
+      return;
+
+    }
+
+    if (correctOption === null) {
+
+      alert("Please select the correct answer");
+
+      return;
+
+    }
+
+
+
+    setIsSubmitting(true);
+
+
+
+    try {
+
+      // In a real app, you would send this to your API/backend
+
+      const quizData = {
+
+        question: question.trim(),
+
+        options: options.map((opt, index) => ({
+
+          id: String.fromCharCode(65 + index).toLowerCase(),
+
+          text: opt.trim(),
+
+        })),
+
+        correctId: String.fromCharCode(65 + correctOption).toLowerCase(),
+
+      };
+
+
+
+      // Simulate API call
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      
+
+      console.log("Quiz published:", quizData);
+
+      
+
+      // Show success message
+
+      setIsSuccess(true);
+
+      setTimeout(() => setIsSuccess(false), 3000);
+
+
+
+      // Reset form
+
+      setQuestion("");
+
+      setOptions(["", "", "", ""]);
+
+      setCorrectOption(null);
+
+    } catch (error) {
+
+      console.error("Error publishing quiz:", error);
+
+      alert("Failed to publish quiz. Please try again.");
+
+    } finally {
+
+      setIsSubmitting(false);
+
+    }
+
+  };
+
+
+
+  const handleCancel = () => {
+
+    setQuestion("");
+
+    setOptions(["", "", "", ""]);
+
+    setCorrectOption(null);
+
+    setIsSuccess(false);
+
+  };
+
+
 
   return (
 
@@ -42,7 +182,21 @@ export default function AdminPanel() {
 
 
 
-        <form className="space-y-6">
+        {isSuccess && (
+
+          <div className="mb-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg flex items-center gap-3">
+
+            <CheckCircle2 className="w-5 h-5 text-green-500" />
+
+            <span className="text-sm text-green-200">Quiz published successfully!</span>
+
+          </div>
+
+        )}
+
+
+
+        <form onSubmit={handleSubmit} className="space-y-6">
 
           {/* Question */}
 
@@ -52,9 +206,15 @@ export default function AdminPanel() {
 
             <Textarea 
 
-              className="bg-black/50 border-white/10 min-h-[100px] text-base resize-none focus-visible:ring-white/20" 
+              className="bg-black/50 border-white/10 min-h-[100px] text-base resize-none focus-visible:ring-white/20 text-white placeholder:text-zinc-500" 
 
               placeholder="Type the clinical question here..."
+
+              value={question}
+
+              onChange={(e) => setQuestion(e.target.value)}
+
+              required
 
             />
 
@@ -68,21 +228,27 @@ export default function AdminPanel() {
 
             <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Answer Options</label>
 
-            {[1, 2, 3, 4].map((num) => (
+            {[0, 1, 2, 3].map((index) => (
 
-              <div key={num} className="flex gap-3">
+              <div key={index} className="flex gap-3 items-center">
 
                 <div className="flex items-center justify-center w-8 h-10 rounded border border-white/10 bg-white/5 text-xs font-mono text-zinc-500">
 
-                  {String.fromCharCode(64 + num)}
+                  {String.fromCharCode(65 + index)}
 
                 </div>
 
                 <Input 
 
-                  className="bg-black/50 border-white/10 focus-visible:ring-white/20"
+                  className="bg-black/50 border-white/10 focus-visible:ring-white/20 text-white placeholder:text-zinc-500 flex-1"
 
-                  placeholder={`Option ${num}`}
+                  placeholder={`Option ${index + 1}`}
+
+                  value={options[index]}
+
+                  onChange={(e) => handleOptionChange(index, e.target.value)}
+
+                  required
 
                 />
 
@@ -94,7 +260,13 @@ export default function AdminPanel() {
 
                     name="correctOption" 
 
+                    checked={correctOption === index}
+
+                    onChange={() => setCorrectOption(index)}
+
                     className="appearance-none w-4 h-4 rounded-full border border-zinc-600 checked:bg-green-500 checked:border-green-500 cursor-pointer" 
+
+                    required
 
                   />
 
@@ -110,13 +282,37 @@ export default function AdminPanel() {
 
           <div className="pt-6 border-t border-white/10 flex justify-end gap-4">
 
-            <Button variant="ghost" className="text-zinc-400 hover:text-white">Cancel</Button>
+            <Button 
 
-            <Button className="bg-white text-black hover:bg-zinc-200 px-6">
+              type="button"
+
+              variant="ghost" 
+
+              className="text-zinc-400 hover:text-white"
+
+              onClick={handleCancel}
+
+              disabled={isSubmitting}
+
+            >
+
+              Cancel
+
+            </Button>
+
+            <Button 
+
+              type="submit"
+
+              className="bg-white text-black hover:bg-zinc-200 px-6 disabled:opacity-50 disabled:cursor-not-allowed"
+
+              disabled={isSubmitting}
+
+            >
 
               <Save className="w-4 h-4 mr-2" />
 
-              Publish Live
+              {isSubmitting ? "Publishing..." : "Publish Live"}
 
             </Button>
 
