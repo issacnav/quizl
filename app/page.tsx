@@ -277,14 +277,13 @@ export default function DailyChallenge() {
 
 
   // Animation Variants
-  const slideVariants = {
+  const slideVariants: Variants = {
     hidden: { x: 50, opacity: 0 },
     visible: { 
       x: 0, 
       opacity: 1,
       transition: {
-        duration: 0.3,
-        ease: "easeOut" as const
+        duration: 0.3
       }
     },
     exit: { 
@@ -294,7 +293,7 @@ export default function DailyChallenge() {
         duration: 0.3
       }
     }
-  } satisfies Variants;
+  };
 
 
 
