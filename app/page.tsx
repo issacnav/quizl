@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 import { Check, X, Trophy, ArrowRight, Activity, User, Loader2 } from "lucide-react";
 
@@ -277,16 +277,24 @@ export default function DailyChallenge() {
 
 
   // Animation Variants
-
   const slideVariants = {
-
     hidden: { x: 50, opacity: 0 },
-
-    visible: { x: 0, opacity: 1 },
-
-    exit: { x: -50, opacity: 0 }
-
-  };
+    visible: { 
+      x: 0, 
+      opacity: 1,
+      transition: {
+        duration: 0.3,
+        ease: "easeOut" as const
+      }
+    },
+    exit: { 
+      x: -50, 
+      opacity: 0,
+      transition: {
+        duration: 0.3
+      }
+    }
+  } satisfies Variants;
 
 
 
@@ -337,8 +345,6 @@ export default function DailyChallenge() {
             animate="visible"
 
             exit="exit"
-
-            transition={{ duration: 0.3 }}
 
           >
 
