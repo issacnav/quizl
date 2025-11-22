@@ -252,38 +252,40 @@ export default function DailyChallenge() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-center pt-8"
+            className="text-center pt-12"
           >
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 mb-3">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 mb-6">
                 {view === "COMPLETED" ? <Trophy className="w-8 h-8 text-yellow-500" /> : <Clock className="w-8 h-8 text-blue-500" />}
             </div>
 
             <h2 className="text-2xl font-bold text-white mb-2">
                 {view === "COMPLETED" ? "Session Complete" : "You've played today"}
             </h2>
-            <p className="text-zinc-400 mb-3 max-w-xs mx-auto leading-relaxed">
+            <p className="text-zinc-400 mb-8 max-w-xs mx-auto leading-relaxed">
                 {view === "COMPLETED" 
                     ? "Great work. Your stats have been recorded." 
                     : "Daily Quiz reset at midnight. Come back tomorrow for a new set of questions."}
             </p>
 
             <div 
-              className="w-48 h-48 mx-auto mb-[-20px] cursor-pointer hover:scale-105 transition-transform"
+              className="w-40 h-40 mx-auto mb-[-12px] cursor-pointer hover:scale-105 transition-transform relative z-20"
               onClick={() => lottieRef.current?.goToAndPlay(0)}
             >
                <Lottie lottieRef={lottieRef} animationData={hiAnimation} loop={false} />
             </div>
 
-            <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-2xl mb-8 relative z-10">
+            <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-2xl mb-8 relative z-10 backdrop-blur-sm">
                 <div className="text-xs text-zinc-500 uppercase tracking-widest mb-1">Your Score</div>
-                <div className="text-4xl font-mono font-bold text-white">{Math.floor(score / 1000)}</div>
+                <div className="text-5xl font-mono font-bold text-white tracking-tighter">
+                    {Math.floor(score / 1000)}
+                </div>
             </div>
 
-            <div className="flex flex-col gap-3">
-                <Button onClick={() => setView("LEADERBOARD")} className="w-full bg-white text-black hover:bg-zinc-200">
+            <div className="flex flex-col gap-3 max-w-xs mx-auto">
+                <Button onClick={() => setView("LEADERBOARD")} className="w-full bg-white text-black hover:bg-zinc-200 font-medium">
                     View Leaderboard
                 </Button>
-                <Button variant="ghost" className="text-zinc-500" disabled>
+                <Button variant="ghost" className="text-zinc-500 text-xs" disabled>
                     Next Quiz in: {24 - new Date().getHours()}h {60 - new Date().getMinutes()}m
                 </Button>
             </div>
