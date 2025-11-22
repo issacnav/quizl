@@ -1,8 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, Trophy, ArrowRight, Loader2, Clock } from "lucide-react";
+import Lottie from "lottie-react";
+import hiAnimation from "@/components/Hi.json";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -40,6 +42,7 @@ export default function DailyChallenge() {
   const [showNameModal, setShowNameModal] = useState(false);
   const [userName, setUserName] = useState("");
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const lottieRef = useRef<any>(null);
 
   // Helper: Get Today's Date String (YYYY-MM-DD)
   const getTodayString = () => new Date().toISOString().split('T')[0];
@@ -264,7 +267,14 @@ export default function DailyChallenge() {
                     : "Daily protocols reset at midnight. Come back tomorrow for a new set of questions."}
             </p>
 
-            <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-2xl mb-8">
+            <div 
+              className="w-48 h-48 mx-auto mb-[-20px] cursor-pointer hover:scale-105 transition-transform"
+              onClick={() => lottieRef.current?.goToAndPlay(0)}
+            >
+               <Lottie lottieRef={lottieRef} animationData={hiAnimation} loop={false} />
+            </div>
+
+            <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-2xl mb-8 relative z-10">
                 <div className="text-xs text-zinc-500 uppercase tracking-widest mb-1">Your Score</div>
                 <div className="text-4xl font-mono font-bold text-white">{Math.floor(score / 1000)}</div>
             </div>
