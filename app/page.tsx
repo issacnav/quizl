@@ -101,15 +101,52 @@ export default function DailyChallenge() {
 
   // 3. Fetch Leaderboard
   useEffect(() => {
-    async function fetchLeaderboard() {
+    // Helper to get start of today in UTC
+    const getStartOfDay = () => {
+      const date = new Date();
+      date.setUTCHours(0, 0, 0, 0);
+      return date.toISOString();
+    };
+
+    const fetchLeaderboard = async () => {
+      const todayISO = getStartOfDay();
+
+      // 1. Fetch only scores created TODAY
       const { data } = await supabase
         .from('leaderboard')
         .select('*')
+        .gte('created_at', todayISO) // Only show today's entries
         .order('score', { ascending: false })
         .limit(20);
-      if (data) setLeaderboard(data);
-    }
+
+      if (data) {
+        setLeaderboard(data);
+      }
+    };
+
     fetchLeaderboard();
+
+    // 2. Realtime Subscription for NEW Inserts
+    const channel = supabase
+      .channel('leaderboard_updates')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'leaderboard' },
+        (payload) => {
+          // Add the new user to the list instantly
+          const newEntry = payload.new;
+          setLeaderboard((prev) => {
+            // Add new entry, sort high to low, keep top 20
+            const updated = [...prev, newEntry].sort((a: any, b: any) => b.score - a.score);
+            return updated.slice(0, 20);
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // 4. Handle Answer
