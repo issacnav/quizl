@@ -33,6 +33,9 @@ export default function DailyChallenge() {
   const [score, setScore] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   
+  // Timing for Score Calculation
+  const [questionStartTime, setQuestionStartTime] = useState<number>(Date.now());
+
   // Leaderboard & User
   const [showNameModal, setShowNameModal] = useState(false);
   const [userName, setUserName] = useState("");
@@ -82,7 +85,12 @@ export default function DailyChallenge() {
     init();
   }, []);
 
-  // 2. Fetch Leaderboard
+  // 2. Reset Timer when Question Changes
+  useEffect(() => {
+    setQuestionStartTime(Date.now());
+  }, [currentIndex, view]);
+
+  // 3. Fetch Leaderboard
   useEffect(() => {
     async function fetchLeaderboard() {
       const { data } = await supabase
@@ -95,24 +103,37 @@ export default function DailyChallenge() {
     fetchLeaderboard();
   }, []);
 
-  // 3. Handle Answer
+  // 4. Handle Answer
   const handleAnswer = (optionId: string) => {
     if (selectedOption) return; 
     
     const currentQuestion = questions[currentIndex];
     const correct = optionId === currentQuestion.correct_id;
     
+    // --- SCORING MATH ---
+    // Base: 10,000 internal points = 10 Visual Points
+    // Bonus: 0 to 100 internal points based on speed (100 - seconds)
+    // Max Internal Score per Q: 10,100
+    // Max Total Internal Score (5 Qs): 50,500
+    // Max Total Visual Score: floor(50,500 / 1000) = 50.
+    
+    const timeTakenSec = (Date.now() - questionStartTime) / 1000;
+    const speedBonus = Math.max(0, 100 - Math.floor(timeTakenSec));
+    const pointsEarned = correct ? (10000 + speedBonus) : 0;
+
     setSelectedOption(optionId);
 
-    if (correct) setScore((prev) => prev + 1000);
+    if (correct) setScore((prev) => prev + pointsEarned);
 
     setTimeout(() => {
       if (currentIndex < questions.length - 1) {
         setCurrentIndex((prev) => prev + 1);
         setSelectedOption(null);
+        // Timer resets via useEffect
       } else {
-        // --- QUIZ FINISHED LOGIC ---
-        finishQuiz(correct ? score + 1000 : score);
+        // Calculate final total before finishing
+        const finalScore = score + (correct ? pointsEarned : 0);
+        finishQuiz(finalScore);
       }
     }, 1200);
   };
@@ -178,7 +199,7 @@ export default function DailyChallenge() {
           >
             <div className="flex items-center justify-between mb-6 text-xs font-mono text-zinc-500">
               <span>QUESTION {currentIndex + 1} / {questions.length}</span>
-              <div className="text-blue-400">SCORE: {score}</div>
+              <div className="text-blue-400 font-bold">SCORE: {Math.floor(score / 1000)}</div>
             </div>
 
             {/* Progress Bar */}
@@ -245,7 +266,7 @@ export default function DailyChallenge() {
 
             <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-2xl mb-8">
                 <div className="text-xs text-zinc-500 uppercase tracking-widest mb-1">Your Score</div>
-                <div className="text-4xl font-mono font-bold text-white">{score}</div>
+                <div className="text-4xl font-mono font-bold text-white">{Math.floor(score / 1000)}</div>
             </div>
 
             <div className="flex flex-col gap-3">
@@ -277,7 +298,7 @@ export default function DailyChallenge() {
                                 <span className={`text-xs font-mono w-4 ${i < 3 ? 'text-yellow-500' : 'text-zinc-600'}`}>{i + 1}</span>
                                 <span className="text-sm text-zinc-300">{user.username || user.name}</span>
                             </div>
-                            <span className="text-xs font-mono text-zinc-500">{user.score}</span>
+                            <span className="text-xs font-mono text-zinc-500">{Math.floor(user.score / 1000)} pts</span>
                         </div>
                     ))}
                 </div>
