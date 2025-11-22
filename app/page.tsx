@@ -162,7 +162,7 @@ export default function DailyChallenge() {
             className="flex flex-col items-center justify-center text-zinc-500 gap-4"
           >
             <Loader2 className="w-8 h-8 animate-spin" />
-            <p className="text-xs font-mono uppercase tracking-widest">Syncing Protocol...</p>
+            <p className="text-xs font-mono uppercase tracking-widest">Syncing Quiz...</p>
           </motion.div>
         )}
 
