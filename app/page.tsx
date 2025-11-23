@@ -99,7 +99,7 @@ export default function DailyChallenge() {
     setQuestionStartTime(Date.now());
   }, [currentIndex, view]);
 
-  // 3. Fetch Leaderboard
+  // 3. Fetch Leaderboard with Real-time Updates
   useEffect(() => {
     async function fetchLeaderboard() {
       const { data } = await supabase
@@ -109,7 +109,28 @@ export default function DailyChallenge() {
         .limit(20);
       if (data) setLeaderboard(data);
     }
+    
+    // Initial fetch
     fetchLeaderboard();
+
+    // Set up real-time subscription
+    const channel = supabase
+      .channel('leaderboard_changes')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'leaderboard' },
+        (payload) => {
+          console.log('Leaderboard change detected:', payload);
+          // Re-fetch the entire leaderboard when any change happens
+          fetchLeaderboard();
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   // 4. Handle Answer
@@ -164,11 +185,15 @@ export default function DailyChallenge() {
     if (!userName) return;
     
     // Insert into Supabase
-    await supabase.from('leaderboard').insert({ username: userName, score: score });
+    const { error } = await supabase.from('leaderboard').insert({ username: userName, score: score });
     
-    // Refresh local list briefly
-    setLeaderboard((prev) => [...prev, { username: userName, score: score }].sort((a, b) => b.score - a.score));
-    
+    if (error) {
+      console.error("Error saving to leaderboard:", error);
+      alert("Failed to save score: " + error.message);
+      return;
+    }
+
+    // The real-time subscription will automatically update the leaderboard
     setShowNameModal(false);
     setView("LEADERBOARD");
   };
