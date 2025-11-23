@@ -52,7 +52,7 @@ export default function AdminPanel() {
   const [loading, setLoading] = useState(false);
   const [listData, setListData] = useState<Question[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Form State
   const [formData, setFormData] = useState<Question>(INITIAL_QUESTION);
 
@@ -74,7 +74,7 @@ export default function AdminPanel() {
     } else {
       setListData(data || []);
     }
-    setLoading(false);
+      setLoading(false);
   }
 
   // --- Actions ---
@@ -157,25 +157,25 @@ export default function AdminPanel() {
 
   return (
     <div className="min-h-screen w-full bg-black text-white font-sans selection:bg-zinc-800">
-      
+
       {/* Header */}
       <header className="border-b border-white/10 bg-zinc-950/50 backdrop-blur sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="h-6 w-6 bg-white rounded" />
             <span className="font-bold text-lg tracking-tight">Admin Panel</span>
-          </div>
-          
+        </div>
+
           {view === "LIST" && (
             <Button onClick={handleCreate} className="bg-white text-black hover:bg-zinc-200 rounded-full px-6 font-medium">
               <Plus className="w-4 h-4 mr-2" /> Add Question
-            </Button>
+          </Button>
           )}
         </div>
       </header>
 
       <main className="max-w-6xl mx-auto px-6 py-8">
-        
+
         {/* --- LIST VIEW --- */}
         {view === "LIST" && (
           <div className="space-y-6">
@@ -206,7 +206,7 @@ export default function AdminPanel() {
                     <div className="flex flex-col items-center justify-center h-12 w-14 bg-zinc-950 rounded-lg border border-white/5 text-zinc-400 shrink-0">
                       <span className="text-[10px] font-bold uppercase tracking-wider">{formatDate(item.date).month}</span>
                       <span className="text-lg font-bold text-white leading-none">{formatDate(item.date).day}</span>
-                    </div>
+                      </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">
@@ -227,13 +227,13 @@ export default function AdminPanel() {
                       >
                         <Edit className="w-4 h-4" />
                       </Button>
-                      <Button 
+                        <Button 
                         size="icon" variant="ghost" 
                         className="h-8 w-8 text-zinc-400 hover:text-red-400 hover:bg-red-950/30"
                         onClick={(e) => { e.stopPropagation(); handleDelete(item.id!); }}
                       >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                            <Trash2 className="w-4 h-4" />
+                        </Button>
                     </div>
                   </div>
                 ))}
@@ -250,14 +250,14 @@ export default function AdminPanel() {
         {/* --- EDIT VIEW --- */}
         {view === "EDIT" && (
           <div className="max-w-2xl mx-auto">
-            
+
             <Button 
               variant="ghost" 
               className="mb-6 text-zinc-400 hover:text-white pl-0 hover:bg-transparent"
               onClick={() => setView("LIST")}
             >
               <ArrowLeft className="w-4 h-4 mr-2" /> Back to List
-            </Button>
+              </Button>
 
             <Card className="bg-zinc-900 border-white/10 p-6 space-y-6">
               
@@ -268,31 +268,31 @@ export default function AdminPanel() {
                 <div className="flex items-center gap-2 bg-black px-3 py-1.5 rounded-lg border border-white/10">
                   <Calendar className="w-4 h-4 text-zinc-400" />
                   <input 
-                    type="date"
+                  type="date" 
                     className="bg-transparent text-sm text-white focus:outline-none color-scheme-dark"
                     value={formData.date}
                     onChange={(e) => setFormData({...formData, date: e.target.value})}
                   />
                 </div>
-              </div>
+                  </div>
 
               {/* Question Text */}
-              <div className="space-y-2">
+                    <div className="space-y-2">
                 <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Question Text</label>
-                <Textarea 
+                      <Textarea 
                   className="bg-black border-white/10 min-h-[100px] text-base resize-none focus-visible:ring-zinc-700"
-                  placeholder="Enter the clinical scenario..."
+                        placeholder="Enter the clinical scenario..."
                   value={formData.question}
                   onChange={(e) => setFormData({...formData, question: e.target.value})}
-                />
-              </div>
+                      />
+                    </div>
 
               {/* Options */}
               <div className="space-y-3">
                 <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider">Options</label>
                 {formData.options_json.map((opt, idx) => (
                   <div key={opt.id} className="flex items-center gap-3">
-                    <button 
+                          <button 
                       onClick={() => setFormData({...formData, correct_id: opt.id})}
                       className={`h-10 w-10 shrink-0 flex items-center justify-center rounded-md border transition-all ${
                         formData.correct_id === opt.id 
@@ -301,24 +301,24 @@ export default function AdminPanel() {
                       }`}
                     >
                       {formData.correct_id === opt.id ? <CheckCircle2 className="w-5 h-5" /> : <span className="font-bold">{opt.id.toUpperCase()}</span>}
-                    </button>
-                    <Input 
+                          </button>
+                          <Input 
                       className="bg-black border-white/10 focus-visible:ring-zinc-700"
-                      placeholder={`Option ${opt.id.toUpperCase()}`}
-                      value={opt.text}
+                            placeholder={`Option ${opt.id.toUpperCase()}`}
+                            value={opt.text}
                       onChange={(e) => updateOption(idx, e.target.value)}
-                    />
+                          />
+                        </div>
+                      ))}
                   </div>
-                ))}
-              </div>
 
-            </Card>
+                </Card>
 
             {/* Save Bar */}
             <div className="flex justify-end mt-6 gap-4">
                <Button variant="ghost" onClick={() => setView("LIST")} className="text-zinc-400 hover:text-white">
                   Cancel
-               </Button>
+                </Button>
                <Button 
                   onClick={handleSave} 
                   disabled={loading}
@@ -326,7 +326,7 @@ export default function AdminPanel() {
                >
                   {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
                   Save Changes
-               </Button>
+                </Button>
             </div>
 
           </div>

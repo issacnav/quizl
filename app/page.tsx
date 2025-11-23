@@ -53,42 +53,53 @@ export default function DailyChallenge() {
   // Helper: Get Today's Date String (YYYY-MM-DD)
   const getTodayString = () => new Date().toISOString().split('T')[0];
 
-  // 1. INITIAL LOAD: Fetch Quiz & Check LocalStorage
   useEffect(() => {
     async function init() {
-      // A. Check if user already played today
-      const lastPlayed = localStorage.getItem("physio_last_played");
       const today = getTodayString();
-      const savedScore = localStorage.getItem("physio_today_score");
+      
+      // A. Check if user FINISHED today
+      const lastPlayed = localStorage.getItem("physio_last_played");
+      if (lastPlayed === today) {
+        const savedScore = localStorage.getItem("physio_today_score");
+        if (savedScore) setScore(parseInt(savedScore));
+        setView("ALREADY_PLAYED");
+        return; // Stop here
+      }
 
-      // B. Fetch Questions from Supabase
+      // B. Check if user has PROGRESS (Mid-game)
+      const savedProgress = localStorage.getItem("physio_progress");
+      let startFromIndex = 0;
+      let startFromScore = 0;
+
+      if (savedProgress) {
+        const parsed = JSON.parse(savedProgress);
+        // Only restore if it matches today's date
+        if (parsed.date === today) {
+            startFromIndex = parsed.index;
+            startFromScore = parsed.score;
+        }
+      }
+
+      // C. Fetch Questions
       const { data, error } = await supabase
         .from('daily_quiz')
         .select('*')
-        .eq('date', today); // Only fetch TODAY'S questions
+        .eq('date', today)
+        .order('id', { ascending: true }); // Ensure consistent order
 
-      if (error) {
-          console.error("Error fetching:", error);
-      }
-
-      if (!data || data.length === 0) {
-        console.log("No quiz found for today:", today);
-        // Fallback: Load any questions if today is empty (for demo purposes)
-        const { data: backupData } = await supabase.from('daily_quiz').select('*').limit(5);
-        setQuestions(backupData || []);
-        setView("QUIZ");
+      if (error || !data || data.length === 0) {
+        console.error("No quiz found");
+        // Optional: Fallback logic if needed, or just stay in loading
       } else {
         setQuestions(data);
         
-        // C. Decide View based on history
-        if (lastPlayed === today) {
-          // User already played today
-          if (savedScore) setScore(parseInt(savedScore));
-          setView("ALREADY_PLAYED");
-        } else {
-          // New user for today
-          setView("QUIZ");
+        // RESTORE STATE
+        if (startFromIndex > 0 && startFromIndex < data.length) {
+            setCurrentIndex(startFromIndex);
+            setScore(startFromScore);
         }
+        
+        setView("QUIZ");
       }
     }
     init();
@@ -136,8 +147,11 @@ export default function DailyChallenge() {
   // 4. Handle Answer
   const handleAnswer = (optionId: string) => {
     if (selectedOption) return; 
+    if (!questions || questions.length === 0) return; // Safety check
     
     const currentQuestion = questions[currentIndex];
+    if (!currentQuestion) return;
+
     const correct = optionId === currentQuestion.correct_id;
     
     // --- SCORING MATH ---
@@ -153,26 +167,39 @@ export default function DailyChallenge() {
 
     setSelectedOption(optionId);
 
-    if (correct) setScore((prev) => prev + pointsEarned);
+    // Calculate new total score immediately for saving
+    const newTotalScore = score + pointsEarned;
+    if (correct) setScore(newTotalScore);
 
     setTimeout(() => {
       if (currentIndex < questions.length - 1) {
-        setCurrentIndex((prev) => prev + 1);
+        // --- SAVE PROGRESS HERE ---
+        const nextIndex = currentIndex + 1;
+        localStorage.setItem("physio_progress", JSON.stringify({
+            date: getTodayString(),
+            index: nextIndex,
+            score: newTotalScore
+        }));
+        
+        setCurrentIndex(nextIndex);
         setSelectedOption(null);
         // Timer resets via useEffect
       } else {
-        // Calculate final total before finishing
-        const finalScore = score + (correct ? pointsEarned : 0);
-        finishQuiz(finalScore);
+        // Quiz Finished
+        finishQuiz(newTotalScore);
       }
     }, 1200);
   };
 
   const finishQuiz = (finalScore: number) => {
-    // 1. Save state to LocalStorage so they can't refresh and retry
     const today = getTodayString();
+    
+    // 1. Save Final Status
     localStorage.setItem("physio_last_played", today);
     localStorage.setItem("physio_today_score", finalScore.toString());
+
+    // 2. CLEAR the temporary progress so it doesn't conflict tomorrow
+    localStorage.removeItem("physio_progress");
 
     setScore(finalScore);
     setView("COMPLETED");
@@ -184,13 +211,8 @@ export default function DailyChallenge() {
   const handleJoinLeaderboard = async () => {
     if (!userName) return;
     
-    // Insert into Supabase with today's date
-    const today = getTodayString();
-    const { error } = await supabase.from('leaderboard').insert({ 
-      username: userName, 
-      score: score,
-      date: today
-    });
+    // Insert into Supabase
+    const { error } = await supabase.from('leaderboard').insert({ username: userName, score: score });
     
     if (error) {
       console.error("Error saving to leaderboard:", error);
