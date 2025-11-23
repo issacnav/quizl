@@ -265,11 +265,14 @@ export default function AdminPanel() {
                 <h2 className="text-xl font-bold text-white">
                   {formData.id ? "Edit Question" : "New Question"}
                 </h2>
-                <div className="flex items-center gap-2 bg-black px-3 py-1.5 rounded-lg border border-white/10">
-                  <Calendar className="w-4 h-4 text-zinc-400" />
+                <div className="flex items-center gap-2 bg-black px-3 py-1.5 rounded-lg border border-white/10 relative group cursor-pointer">
+                  <Calendar className="w-4 h-4 text-zinc-400 pointer-events-none" />
+                  <span className="text-sm text-white font-mono pointer-events-none">
+                    {formData.date || "Select Date"}
+                  </span>
                   <input 
-                  type="date" 
-                    className="bg-transparent text-sm text-white focus:outline-none color-scheme-dark"
+                    type="date"
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                     value={formData.date}
                     onChange={(e) => setFormData({...formData, date: e.target.value})}
                   />
