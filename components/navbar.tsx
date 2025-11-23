@@ -5,8 +5,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
-
-
+import AuthButton from "@/components/AuthButton";
 
 export default function Navbar() {
 
@@ -43,15 +42,10 @@ export default function Navbar() {
         </nav>
 
         <div className="flex items-center gap-4">
-
           <Link href="/admin">
-
             <Button variant="ghost" size="sm" className="text-muted-foreground">Admin</Button>
-
           </Link>
-
-          <Button size="sm" className="rounded-full px-6">Get Started</Button>
-
+          <AuthButton />
         </div>
 
       </div>

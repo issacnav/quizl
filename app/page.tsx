@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, Trophy, ArrowRight, Loader2, Clock, Activity } from "lucide-react";
 import Lottie from "lottie-react";
 import hiAnimation from "@/components/Hi.json";
+import deadAnimation from "@/components/Dead.json";
+import cryAnimation from "@/components/Cry.json";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -49,9 +51,14 @@ export default function DailyChallenge() {
   const [userName, setUserName] = useState("");
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const lottieRef = useRef<any>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Helper: Get Today's Date String (YYYY-MM-DD)
   const getTodayString = () => new Date().toISOString().split('T')[0];
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUser(data.user));
+  }, []);
 
   useEffect(() => {
     async function init() {
@@ -191,6 +198,22 @@ export default function DailyChallenge() {
     }, 1200);
   };
 
+  const saveScoreToDb = async (finalScore: number, user: any) => {
+    if (!user) return;
+    
+    // 1. Insert into Leaderboard
+    const today = getTodayString();
+    await supabase.from('leaderboard').insert({
+      username: user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro",
+      score: finalScore,
+      date: today,
+      user_id: user.id // Assuming user_id column exists, otherwise remove or add it
+    });
+
+    // 2. Update Profile XP (Cumulative) - Optional but good for "Career Profile"
+    // We'll skip complex profile logic for now and just focus on the leaderboard entry
+  };
+
   const finishQuiz = (finalScore: number) => {
     const today = getTodayString();
     
@@ -203,12 +226,16 @@ export default function DailyChallenge() {
 
     setScore(finalScore);
     setView("COMPLETED");
-    
-    // Small delay before asking for name
-    setTimeout(() => setShowNameModal(true), 800);
+
+    // AUTO-SAVE if logged in
+    if (currentUser) {
+      saveScoreToDb(finalScore, currentUser);
+    } 
+    // If NOT logged in, we show the "Sign in to Claim" UI
   };
 
   const handleJoinLeaderboard = async () => {
+    // This is the manual "Enter Name" fallback for guest users
     if (!userName) return;
     
     // Insert into Supabase
@@ -230,6 +257,57 @@ export default function DailyChallenge() {
     setView("LEADERBOARD");
   };
 
+  // Check for pending score after login redirect
+  useEffect(() => {
+    const checkPendingScore = async () => {
+      // 1. Get User
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      setCurrentUser(user);
+
+      // 2. Check if we just played today
+      const today = getTodayString();
+      const lastPlayed = localStorage.getItem("physio_last_played");
+      const localScore = localStorage.getItem("physio_today_score");
+
+      if (lastPlayed === today && localScore) {
+         // 3. Check if we already uploaded (to prevent duplicates)
+         // Note: You might need to adjust this query if 'user_id' column isn't in leaderboard yet
+         const { data: existing } = await supabase
+           .from('leaderboard')
+           .select('*')
+           .eq('username', user.user_metadata.full_name || user.email?.split('@')[0]) // Approximate check if user_id missing
+           .eq('date', today);
+
+         if (!existing || existing.length === 0) {
+            // 4. UPLOAD PENDING SCORE
+            await saveScoreToDb(parseInt(localScore), user);
+            console.log("Pending score uploaded after login!");
+         }
+      }
+    };
+    
+    checkPendingScore();
+  }, []);
+
+  // --- FEEDBACK HELPER ---
+  const getFeedbackMessage = (score: number) => {
+    const visualScore = Math.floor(score / 1000);
+    if (visualScore <= 10) return "Clinical review recommended. Time to brush up on the basics.";
+    if (visualScore <= 20) return "Good warmup. Consistency is the key to clinical mastery.";
+    if (visualScore <= 30) return "Solid performance. Your diagnostic reflexes are getting sharper.";
+    if (visualScore <= 40) return "Excellent work. Your clinical reasoning is elite.";
+    return "World-class precision. You are ready for the toughest cases.";
+  };
+
+  // --- MASCOT HELPER ---
+  const getMascotAnimation = (finalScore: number) => {
+    const visualScore = Math.floor(finalScore / 1000);
+    if (visualScore === 0) return deadAnimation;
+    if (visualScore <= 20) return cryAnimation; // 10 or 20 pts
+    return hiAnimation; // 30, 40, 50 pts
+  };
+
   // --- ANIMATION VARIANTS ---
   const slideVariants = {
     hidden: { x: 50, opacity: 0 },
@@ -238,7 +316,7 @@ export default function DailyChallenge() {
   };
 
   return (
-    <main className="w-full max-w-lg px-4 relative flex flex-col justify-center mx-auto min-h-screen pt-32">
+    <main className="w-full max-w-lg px-4 relative flex flex-col justify-center mx-auto min-h-screen pt-2">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
 
       {/* --- SITE HEADER (Only on first question) --- */}
@@ -351,7 +429,7 @@ export default function DailyChallenge() {
             </h2>
             <p className="text-zinc-400 mb-8 max-w-xs mx-auto leading-relaxed">
                 {view === "COMPLETED" 
-                    ? "Great work. Your stats have been recorded." 
+                    ? getFeedbackMessage(score)
                     : "Daily Quiz reset at midnight. Come back tomorrow for a new set of questions."}
             </p>
 
@@ -359,7 +437,11 @@ export default function DailyChallenge() {
               className="w-40 h-40 mx-auto mb-[-12px] cursor-pointer hover:scale-105 transition-transform relative z-20"
               onClick={() => lottieRef.current?.goToAndPlay(0)}
             >
-               <Lottie lottieRef={lottieRef} animationData={hiAnimation} loop={false} />
+               <Lottie 
+                 lottieRef={lottieRef} 
+                 animationData={getMascotAnimation(score)} 
+                 loop={false} 
+               />
             </div>
 
             <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-2xl mb-8 relative z-10 backdrop-blur-sm">
@@ -370,12 +452,37 @@ export default function DailyChallenge() {
             </div>
 
             <div className="flex flex-col gap-3 max-w-xs mx-auto">
-                <Button onClick={() => setView("LEADERBOARD")} className="w-full bg-white text-black hover:bg-zinc-200 font-medium">
-                    View Leaderboard
-                </Button>
-                <Button variant="ghost" className="text-zinc-500 text-xs" disabled>
-                    Next Quiz in: {24 - new Date().getHours()}h {60 - new Date().getMinutes()}m
-                </Button>
+                {!currentUser ? (
+                  <div className="space-y-3 w-full">
+                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl text-center">
+                      <p className="text-xs text-blue-200 mb-3 leading-relaxed">
+                        Sign in to save these <strong>{Math.floor(score/1000)} points</strong> to your career profile.
+                      </p>
+                      <Button 
+                        onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } })}
+                        className="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold h-9"
+                      >
+                        Claim Points & Sign Up
+                      </Button>
+                    </div>
+                    
+                    <Button variant="secondary" onClick={() => setView("LEADERBOARD")} className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs h-9">
+                      View Leaderboard
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3 w-full">
+                    <div className="text-center text-xs text-green-400 mb-1 flex items-center justify-center gap-2">
+                       <Check className="w-3 h-3" /> Score Saved to Profile
+                    </div>
+                    <Button onClick={() => setView("LEADERBOARD")} className="w-full bg-white text-black hover:bg-zinc-200 font-medium">
+                       View Global Rankings
+                    </Button>
+                    <Button variant="ghost" className="text-zinc-500 text-xs" disabled>
+                        Next Quiz in: {24 - new Date().getHours()}h {60 - new Date().getMinutes()}m
+                    </Button>
+                  </div>
+                )}
             </div>
           </motion.div>
         )}
