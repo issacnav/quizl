@@ -331,13 +331,13 @@ export default function DailyChallenge() {
           >
             <div className="flex items-center gap-3 mb-2">
               {/* Text with Linear Gradient */}
-              <h1 className="text-3xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40">
+              <h1 className="text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40">
                 PhysioQuiz
               </h1>
             </div>
             
             {/* Subtitle tag */}
-            <div className="px-4 py-1 rounded-full border border-white/5 bg-white/5 text-xs font-medium text-zinc-400 tracking-widest uppercase">
+            <div className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-sm font-medium text-zinc-400 tracking-widest uppercase">
               Test Your Knowledge
             </div>
           </motion.div>
