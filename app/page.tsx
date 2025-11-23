@@ -212,7 +212,12 @@ export default function DailyChallenge() {
     if (!userName) return;
     
     // Insert into Supabase
-    const { error } = await supabase.from('leaderboard').insert({ username: userName, score: score });
+    const today = getTodayString();
+    const { error } = await supabase.from('leaderboard').insert({ 
+      username: userName, 
+      score: score,
+      date: today 
+    });
     
     if (error) {
       console.error("Error saving to leaderboard:", error);
