@@ -316,7 +316,7 @@ export default function DailyChallenge() {
   };
 
   return (
-    <main className="w-full max-w-lg px-4 relative flex flex-col justify-center mx-auto min-h-screen pt-2">
+    <main className="w-full max-w-lg px-4 relative flex flex-col justify-center items-center mx-auto min-h-screen pt-2">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
 
       {/* --- SITE HEADER (Only on first question) --- */}

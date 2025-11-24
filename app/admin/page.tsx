@@ -156,15 +156,15 @@ export default function AdminPanel() {
   );
 
   return (
-    <div className="min-h-screen w-full bg-black text-white font-sans selection:bg-zinc-800">
+    <div className="w-full text-white font-sans selection:bg-zinc-800">
 
       {/* Header */}
-      <header className="border-b border-white/10 bg-zinc-950/50 backdrop-blur sticky top-0 z-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-6 w-6 bg-white rounded" />
-            <span className="font-bold text-lg tracking-tight">Admin Panel</span>
-        </div>
+      <header className="border-b border-white/10 bg-zinc-950/50 backdrop-blur sticky top-0 z-40">
+        <div className="px-6 h-16 flex items-center justify-between w-full">
+          <div>
+            <h1 className="font-bold text-lg tracking-tight">Manage Quizzes</h1>
+            <p className="text-xs text-zinc-500">Create and edit daily questions</p>
+          </div>
 
           {view === "LIST" && (
             <Button onClick={handleCreate} className="bg-white text-black hover:bg-zinc-200 rounded-full px-6 font-medium">
@@ -174,7 +174,7 @@ export default function AdminPanel() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="px-6 py-8">
 
         {/* --- LIST VIEW --- */}
         {view === "LIST" && (
@@ -249,7 +249,7 @@ export default function AdminPanel() {
 
         {/* --- EDIT VIEW --- */}
         {view === "EDIT" && (
-          <div className="max-w-2xl mx-auto">
+          <div className="max-w-2xl">
 
             <Button 
               variant="ghost" 
