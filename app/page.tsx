@@ -535,7 +535,6 @@ export default function DailyChallenge() {
                         <div className="space-y-2">
                             {leaderboard.map((user, i) => {
                                 const isTopThree = i < 3;
-                                const medals = ['🥇', '🥈', '🥉'];
                                 
                                 return (
                                     <motion.div
@@ -561,7 +560,7 @@ export default function DailyChallenge() {
                                                     : 'bg-zinc-700/50 text-zinc-500 border border-zinc-600/30'
                                                 }
                                             `}>
-                                                {isTopThree ? medals[i] : `#${i + 1}`}
+                                                #{i + 1}
                                             </div>
 
                                             {/* Username */}
