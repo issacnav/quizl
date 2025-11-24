@@ -499,22 +499,119 @@ export default function DailyChallenge() {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="w-full bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden"
+                className="w-full bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
             >
-                <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
-                    <h3 className="font-semibold text-white">Today's Top Physios</h3>
-                    <Button variant="ghost" size="sm" onClick={() => setView("ALREADY_PLAYED")} className="h-6 text-xs">Back</Button>
-                </div>
-                <div className="p-2 max-h-[400px] overflow-y-auto">
-                    {leaderboard.map((user, i) => (
-                        <div key={i} className="flex items-center justify-between p-3 hover:bg-white/5 rounded-lg transition-colors px-4">
-                            <div className="flex items-center gap-4">
-                                <span className={`text-xs font-mono w-4 ${i < 3 ? 'text-yellow-500' : 'text-zinc-600'}`}>{i + 1}</span>
-                                <span className="text-sm text-zinc-300">{user.username || user.name}</span>
+                {/* Header with Trophy Icon */}
+                <div className="p-6 border-b border-white/10 bg-gradient-to-r from-yellow-500/10 via-white/5 to-blue-500/10">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                                <Trophy className="w-5 h-5 text-yellow-500" />
                             </div>
-                            <span className="text-xs font-mono text-zinc-500">{Math.floor(user.score / 1000)} pts</span>
+                            <div>
+                                <h3 className="font-bold text-white text-lg">Today's Top Physios</h3>
+                                <p className="text-xs text-zinc-400">Live Rankings • Updated in Real-time</p>
+                            </div>
                         </div>
-                    ))}
+                        <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => setView("ALREADY_PLAYED")} 
+                            className="h-8 text-xs hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                        >
+                            Back
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Leaderboard List */}
+                <div className="p-4 max-h-[500px] overflow-y-auto">
+                    {leaderboard.length === 0 ? (
+                        <div className="text-center py-12 text-zinc-500">
+                            <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                            <p className="text-sm">No entries yet. Be the first!</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-2">
+                            {leaderboard.map((user, i) => {
+                                const isTopThree = i < 3;
+                                const medals = ['🥇', '🥈', '🥉'];
+                                
+                                return (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        transition={{ delay: i * 0.05 }}
+                                        className={`
+                                            group relative flex items-center justify-between p-4 rounded-xl transition-all duration-300
+                                            ${isTopThree 
+                                                ? 'bg-gradient-to-r from-yellow-500/10 to-transparent border border-yellow-500/20 hover:border-yellow-500/40' 
+                                                : 'bg-zinc-800/30 border border-transparent hover:border-white/10 hover:bg-zinc-800/50'
+                                            }
+                                            cursor-pointer transform hover:scale-[1.02] hover:shadow-lg
+                                        `}
+                                    >
+                                        {/* Rank Badge */}
+                                        <div className="flex items-center gap-4 flex-1">
+                                            <div className={`
+                                                flex items-center justify-center w-10 h-10 rounded-lg font-bold text-sm
+                                                ${isTopThree 
+                                                    ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
+                                                    : 'bg-zinc-700/50 text-zinc-500 border border-zinc-600/30'
+                                                }
+                                            `}>
+                                                {isTopThree ? medals[i] : `#${i + 1}`}
+                                            </div>
+
+                                            {/* Username */}
+                                            <div className="flex-1">
+                                                <div className={`font-semibold ${isTopThree ? 'text-white' : 'text-zinc-300'} group-hover:text-white transition-colors`}>
+                                                    {user.username || user.name}
+                                                </div>
+                                                {isTopThree && (
+                                                    <div className="text-xs text-yellow-500/70 font-medium">Top Performer</div>
+                                                )}
+                                            </div>
+
+                                            {/* Score Badge */}
+                                            <div className={`
+                                                px-4 py-2 rounded-lg font-mono font-bold text-sm
+                                                ${isTopThree 
+                                                    ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
+                                                    : 'bg-zinc-700/50 text-zinc-400 border border-zinc-600/30'
+                                                }
+                                                group-hover:scale-110 transition-transform
+                                            `}>
+                                                {Math.floor(user.score / 1000)} pts
+                                            </div>
+                                        </div>
+
+                                        {/* Animated Shine Effect for Top 3 */}
+                                        {isTopThree && (
+                                            <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
+                                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                                            </div>
+                                        )}
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer Stats */}
+                <div className="p-4 border-t border-white/10 bg-white/5">
+                    <div className="flex items-center justify-between text-xs text-zinc-500">
+                        <div className="flex items-center gap-2">
+                            <Activity className="w-3 h-3" />
+                            <span>{leaderboard.length} players today</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Clock className="w-3 h-3" />
+                            <span>Resets at midnight</span>
+                        </div>
+                    </div>
                 </div>
             </motion.div>
         )}
