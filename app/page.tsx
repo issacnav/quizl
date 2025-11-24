@@ -214,10 +214,10 @@ export default function DailyChallenge() {
     // We'll skip complex profile logic for now and just focus on the leaderboard entry
   };
 
-  const finishQuiz = (finalScore: number) => {
+  const finishQuiz = async (finalScore: number) => {
     const today = getTodayString();
     
-    // 1. Save Final Status
+    // 1. Save Final Status Locally
     localStorage.setItem("physio_last_played", today);
     localStorage.setItem("physio_today_score", finalScore.toString());
 
@@ -227,7 +227,14 @@ export default function DailyChallenge() {
     setScore(finalScore);
     setView("COMPLETED");
 
-    // AUTO-SAVE if logged in
+    // 3. LOG ATTEMPT ANONYMOUSLY (For Analytics)
+    // We do this for EVERYONE who finishes, regardless of leaderboard
+    await supabase.from('quiz_attempts').insert({
+      score: finalScore,
+      date: today
+    });
+
+    // 4. AUTO-SAVE if logged in (Leaderboard)
     if (currentUser) {
       saveScoreToDb(finalScore, currentUser);
     } 

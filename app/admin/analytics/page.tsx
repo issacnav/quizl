@@ -404,14 +404,14 @@ export default function AnalyticsPage() {
         ? new Set(usersData.map((u) => u.username)).size
         : 0;
 
-      // 2. Total attempts (count all leaderboard entries)
+      // 2. Total attempts (count from quiz_attempts table for accuracy)
       const { count: totalAttempts, error: attemptsError } = await supabase
-        .from("leaderboard")
+        .from("quiz_attempts")
         .select("*", { count: "exact", head: true });
 
-      // 3. Average score
+      // 3. Average score (from quiz_attempts)
       const { data: scoresData, error: scoresError } = await supabase
-        .from("leaderboard")
+        .from("quiz_attempts")
         .select("score");
 
       let avgScore = 0;
@@ -422,13 +422,13 @@ export default function AnalyticsPage() {
         maxScore = Math.max(...scoresData.map((s) => s.score || 0), 50000);
       }
 
-      // 4. Activity data (attempts per day over last 30 days)
+      // 4. Activity data (attempts per day over last 30 days from quiz_attempts)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const thirtyDaysAgoStr = thirtyDaysAgo.toISOString().split("T")[0];
 
       const { data: activityRaw, error: activityError } = await supabase
-        .from("leaderboard")
+        .from("quiz_attempts")
         .select("created_at")
         .gte("created_at", thirtyDaysAgoStr)
         .order("created_at", { ascending: true });
@@ -523,6 +523,23 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     fetchAnalyticsData();
+
+    // Real-time Subscription (Listen to quiz_attempts)
+    const channel = supabase
+      .channel('analytics_updates')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'quiz_attempts' },
+        (payload) => {
+          console.log('New anonymous quiz attempt detected:', payload);
+          fetchAnalyticsData();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [fetchAnalyticsData]);
 
   // ==========================================================================
