@@ -323,7 +323,7 @@ export default function DailyChallenge() {
   };
 
   return (
-    <main className="w-full max-w-lg px-4 relative flex flex-col justify-center items-center mx-auto min-h-screen pt-2">
+    <main className={`w-full px-4 relative flex flex-col justify-center items-center mx-auto min-h-screen pt-2 transition-all duration-500 ${view === "LEADERBOARD" ? "max-w-2xl" : "max-w-lg"}`}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
 
       {/* --- SITE HEADER (Only on first question) --- */}
@@ -499,7 +499,7 @@ export default function DailyChallenge() {
             <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden"
+                className="w-full bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden"
             >
                 <div className="p-4 border-b border-white/10 bg-white/5 flex justify-between items-center">
                     <h3 className="font-semibold text-white">Today's Top Physios</h3>
