@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/utils/supabase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +55,9 @@ export default function AdminPanel() {
 
   // Form State
   const [formData, setFormData] = useState<Question>(INITIAL_QUESTION);
+  
+  // Refs for date inputs
+  const dateInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
 
   useEffect(() => {
     if (view === "LIST") fetchQuestions();
@@ -141,6 +144,19 @@ export default function AdminPanel() {
     }
   };
 
+  const handleQuickDateUpdate = async (id: number, newDate: string) => {
+    const { error } = await supabase
+      .from("daily_quiz")
+      .update({ date: newDate })
+      .eq("id", id);
+      
+    if (error) {
+      alert("Failed to update date: " + error.message);
+    } else {
+      fetchQuestions();
+    }
+  };
+
   // --- Form Helpers ---
 
   const updateOption = (index: number, text: string) => {
@@ -203,10 +219,39 @@ export default function AdminPanel() {
                     className="group flex items-center gap-4 p-4 bg-zinc-900/50 border border-white/5 hover:border-white/10 rounded-xl cursor-pointer transition-all hover:bg-zinc-900"
                   >
                     {/* Date Badge */}
-                    <div className="flex flex-col items-center justify-center h-12 w-14 bg-zinc-950 rounded-lg border border-white/5 text-zinc-400 shrink-0">
+                    <div 
+                      className="relative flex flex-col items-center justify-center h-12 w-14 bg-zinc-950 rounded-lg border border-white/5 text-zinc-400 shrink-0 hover:border-white/20 transition-colors cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const input = dateInputRefs.current[item.id!];
+                        if (input) {
+                          try {
+                            input.showPicker();
+                          } catch {
+                            input.focus();
+                            input.click();
+                          }
+                        }
+                      }}
+                      title="Click to change date"
+                    >
                       <span className="text-[10px] font-bold uppercase tracking-wider">{formatDate(item.date).month}</span>
                       <span className="text-lg font-bold text-white leading-none">{formatDate(item.date).day}</span>
-                      </div>
+                      
+                      <input 
+                        ref={(el) => { dateInputRefs.current[item.id!] = el; }}
+                        type="date"
+                        className="sr-only"
+                        defaultValue={item.date}
+                        onClick={(e) => e.stopPropagation()}
+                        onChange={(e) => {
+                           const newDate = e.target.value;
+                           if (newDate && item.id) {
+                              handleQuickDateUpdate(item.id, newDate);
+                           }
+                        }}
+                      />
+                    </div>
 
                     {/* Content */}
                     <div className="flex-1 min-w-0">

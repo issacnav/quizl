@@ -323,7 +323,7 @@ export default function DailyChallenge() {
   };
 
   return (
-    <main className={`w-full px-4 relative flex flex-col justify-center items-center mx-auto min-h-screen pt-2 transition-all duration-500 ${view === "LEADERBOARD" ? "max-w-2xl" : "max-w-lg"}`}>
+    <main className={`w-full px-4 sm:px-6 relative flex flex-col justify-center items-center mx-auto min-h-screen pt-2 transition-all duration-500 ${view === "LEADERBOARD" ? "max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl" : "max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl"}`}>
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
 
       {/* --- SITE HEADER (Only on first question) --- */}
@@ -338,7 +338,7 @@ export default function DailyChallenge() {
           >
             <div className="flex items-center gap-3 mb-2">
               {/* Text with Linear Gradient */}
-              <h1 className="text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40">
                 PhysioQuiz
               </h1>
             </div>
@@ -373,13 +373,13 @@ export default function DailyChallenge() {
             exit="exit"
             transition={{ duration: 0.3 }}
           >
-            <div className="flex items-center justify-between mb-6 text-xs font-mono text-zinc-500">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 text-xs sm:text-sm font-mono text-zinc-500">
               <span>QUESTION {currentIndex + 1} / {questions.length}</span>
               <div className="text-blue-400 font-bold">SCORE: {Math.floor(score / 1000)}</div>
             </div>
 
             {/* Progress Bar */}
-            <div className="w-full h-1 bg-zinc-800 rounded-full mb-8 overflow-hidden">
+            <div className="w-full h-1 sm:h-1.5 bg-zinc-800 rounded-full mb-6 sm:mb-8 overflow-hidden">
               <motion.div 
                 className="h-full bg-blue-500"
                 initial={{ width: `${((currentIndex) / questions.length) * 100}%` }}
@@ -387,11 +387,11 @@ export default function DailyChallenge() {
               />
             </div>
 
-            <h2 className="text-xl font-medium leading-tight text-white mb-8">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-medium leading-tight text-white mb-6 sm:mb-8">
               {questions[currentIndex].question}
             </h2>
 
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3 md:space-y-4">
               {questions[currentIndex].options_json.map((opt) => {
                 const isSelected = selectedOption === opt.id;
                 const isCorrect = opt.id === questions[currentIndex].correct_id;
@@ -409,10 +409,10 @@ export default function DailyChallenge() {
                     key={opt.id}
                     disabled={!!selectedOption}
                     onClick={() => handleAnswer(opt.id)}
-                    className={`w-full p-4 rounded-xl text-left border transition-all duration-200 flex justify-between items-center ${style}`}
+                    className={`w-full p-3 sm:p-4 md:p-5 rounded-xl text-left border transition-all duration-200 flex justify-between items-center ${style}`}
                   >
-                    <span className="text-sm font-medium">{opt.text}</span>
-                    {isSelected && (isCorrect ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />)}
+                    <span className="text-sm sm:text-base font-medium">{opt.text}</span>
+                    {isSelected && (isCorrect ? <Check className="w-4 h-4 sm:w-5 sm:h-5" /> : <X className="w-4 h-4 sm:w-5 sm:h-5" />)}
                   </button>
                 );
               })}
@@ -431,10 +431,10 @@ export default function DailyChallenge() {
                 {view === "COMPLETED" ? <Trophy className="w-8 h-8 text-yellow-500" /> : <Clock className="w-8 h-8 text-blue-500" />}
             </div>
 
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
                 {view === "COMPLETED" ? "Session Complete" : "You've played today"}
             </h2>
-            <p className="text-zinc-400 mb-8 max-w-xs mx-auto leading-relaxed">
+            <p className="text-sm sm:text-base text-zinc-400 mb-6 sm:mb-8 max-w-xs sm:max-w-sm mx-auto leading-relaxed">
                 {view === "COMPLETED" 
                     ? getFeedbackMessage(score)
                     : "Daily Quiz reset at midnight. Come back tomorrow for a new set of questions."}
@@ -451,14 +451,14 @@ export default function DailyChallenge() {
                />
             </div>
 
-            <div className="p-6 bg-zinc-900/50 border border-white/5 rounded-2xl mb-8 relative z-10 backdrop-blur-sm">
-                <div className="text-xs text-zinc-500 uppercase tracking-widest mb-1">Your Score</div>
-                <div className="text-5xl font-mono font-bold text-white tracking-tighter">
+            <div className="p-4 sm:p-6 md:p-8 bg-zinc-900/50 border border-white/5 rounded-2xl mb-6 sm:mb-8 relative z-10 backdrop-blur-sm">
+                <div className="text-xs sm:text-sm text-zinc-500 uppercase tracking-widest mb-1">Your Score</div>
+                <div className="text-4xl sm:text-5xl md:text-6xl font-mono font-bold text-white tracking-tighter">
                     {Math.floor(score / 1000)}
                 </div>
             </div>
 
-            <div className="flex flex-col gap-3 max-w-xs mx-auto">
+            <div className="flex flex-col gap-3 max-w-xs sm:max-w-sm md:max-w-md mx-auto w-full">
                 {!currentUser ? (
                   <div className="space-y-3 w-full">
                     <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl text-center">
@@ -502,15 +502,15 @@ export default function DailyChallenge() {
                 className="w-full bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
             >
                 {/* Header with Trophy Icon */}
-                <div className="p-6 border-b border-white/10 bg-gradient-to-r from-yellow-500/10 via-white/5 to-blue-500/10">
+                <div className="p-4 sm:p-6 border-b border-white/10 bg-gradient-to-r from-yellow-500/10 via-white/5 to-blue-500/10">
                     <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                                <Trophy className="w-5 h-5 text-yellow-500" />
+                        <div className="flex items-center gap-2 sm:gap-3">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
+                                <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
                             </div>
                             <div>
-                                <h3 className="font-bold text-white text-lg">Today's Top Physios</h3>
-                                <p className="text-xs text-zinc-400">Live Rankings • Updated in Real-time</p>
+                                <h3 className="font-bold text-white text-base sm:text-lg">Today's Top Physios</h3>
+                                <p className="text-[10px] sm:text-xs text-zinc-400">Live Rankings • Updated in Real-time</p>
                             </div>
                         </div>
                         <Button 
@@ -525,7 +525,7 @@ export default function DailyChallenge() {
                 </div>
 
                 {/* Leaderboard List */}
-                <div className="p-4 max-h-[500px] overflow-y-auto">
+                <div className="p-3 sm:p-4 max-h-[400px] sm:max-h-[500px] overflow-y-auto">
                     {leaderboard.length === 0 ? (
                         <div className="text-center py-12 text-zinc-500">
                             <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
@@ -543,7 +543,7 @@ export default function DailyChallenge() {
                                         animate={{ opacity: 1, x: 0 }}
                                         transition={{ delay: i * 0.05 }}
                                         className={`
-                                            group relative flex items-center justify-between p-4 rounded-xl transition-all duration-300
+                                            group relative flex items-center justify-between p-3 sm:p-4 rounded-xl transition-all duration-300
                                             ${isTopThree 
                                                 ? 'bg-gradient-to-r from-yellow-500/10 to-transparent border border-yellow-500/20 hover:border-yellow-500/40' 
                                                 : 'bg-zinc-800/30 border border-transparent hover:border-white/10 hover:bg-zinc-800/50'
@@ -552,9 +552,9 @@ export default function DailyChallenge() {
                                         `}
                                     >
                                         {/* Rank Badge */}
-                                        <div className="flex items-center gap-4 flex-1">
+                                        <div className="flex items-center gap-2 sm:gap-4 flex-1">
                                             <div className={`
-                                                flex items-center justify-center w-10 h-10 rounded-lg font-bold text-sm
+                                                flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg font-bold text-xs sm:text-sm
                                                 ${isTopThree 
                                                     ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
                                                     : 'bg-zinc-700/50 text-zinc-500 border border-zinc-600/30'
@@ -564,18 +564,18 @@ export default function DailyChallenge() {
                                             </div>
 
                                             {/* Username */}
-                                            <div className="flex-1">
-                                                <div className={`font-semibold ${isTopThree ? 'text-white' : 'text-zinc-300'} group-hover:text-white transition-colors`}>
+                                            <div className="flex-1 min-w-0">
+                                                <div className={`font-semibold text-sm sm:text-base truncate ${isTopThree ? 'text-white' : 'text-zinc-300'} group-hover:text-white transition-colors`}>
                                                     {user.username || user.name}
                                                 </div>
                                                 {isTopThree && (
-                                                    <div className="text-xs text-yellow-500/70 font-medium">Top Performer</div>
+                                                    <div className="text-[10px] sm:text-xs text-yellow-500/70 font-medium">Top Performer</div>
                                                 )}
                                             </div>
 
                                             {/* Score Badge */}
                                             <div className={`
-                                                px-4 py-2 rounded-lg font-mono font-bold text-sm
+                                                px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg font-mono font-bold text-xs sm:text-sm
                                                 ${isTopThree 
                                                     ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
                                                     : 'bg-zinc-700/50 text-zinc-400 border border-zinc-600/30'

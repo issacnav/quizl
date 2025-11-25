@@ -21,3 +21,4 @@ CREATE POLICY "Allow public read on quiz_attempts" ON quiz_attempts
 CREATE INDEX IF NOT EXISTS idx_quiz_attempts_date ON quiz_attempts(date);
 CREATE INDEX IF NOT EXISTS idx_quiz_attempts_created_at ON quiz_attempts(created_at);
 
+
