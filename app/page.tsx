@@ -217,28 +217,46 @@ export default function DailyChallenge() {
     const today = getTodayString();
     const username = user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro";
     
-    // 1. Check if user already has an entry in leaderboard (by user_id if exists, else by username)
-    const { data: existing } = await supabase
+    // 1. Check if user already has ANY entry in leaderboard (handle multiple entries)
+    const { data: existingEntries, error: fetchError } = await supabase
       .from('leaderboard')
       .select('*')
       .eq('user_id', user.id)
-      .maybeSingle();
+      .order('score', { ascending: false }) // Get highest score first
+      .limit(10);
     
-    if (existing) {
-      // 2a. UPDATE existing entry - accumulate the score
+    if (fetchError) {
+      console.error("Error checking existing entries:", fetchError);
+      return;
+    }
+    
+    if (existingEntries && existingEntries.length > 0) {
+      // 2a. User has existing entry(ies) - UPDATE the first one (highest score)
+      const existing = existingEntries[0];
       const newTotalScore = existing.score + todayScore;
+      
       await supabase
         .from('leaderboard')
         .update({ 
           score: newTotalScore,
-          date: today, // Update date to latest play
-          username: username // Update username in case it changed
+          date: today,
+          username: username
         })
         .eq('id', existing.id);
       
       console.log(`Updated leaderboard: ${existing.score} + ${todayScore} = ${newTotalScore}`);
+      
+      // 2b. Clean up any duplicate entries (keep only the one we just updated)
+      if (existingEntries.length > 1) {
+        const duplicateIds = existingEntries.slice(1).map(e => e.id);
+        await supabase
+          .from('leaderboard')
+          .delete()
+          .in('id', duplicateIds);
+        console.log(`Cleaned up ${duplicateIds.length} duplicate entries`);
+      }
     } else {
-      // 2b. INSERT new entry for first-time users
+      // 3. No existing entry - INSERT new entry for first-time users
       await supabase.from('leaderboard').insert({
         username: username,
         score: todayScore,
@@ -319,18 +337,11 @@ export default function DailyChallenge() {
       
       if (historyDates.length === 0) return;
 
-      // 3. Check what's already uploaded for this user
-      const { data: existing } = await supabase
-        .from('leaderboard')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      // 4. Get the dates that are already synced (stored in localStorage)
+      // 3. Get the dates that are already synced (stored in localStorage)
       const syncedDatesStr = localStorage.getItem("physio_synced_dates_" + user.id);
       const syncedDates: string[] = syncedDatesStr ? JSON.parse(syncedDatesStr) : [];
 
-      // 5. Find dates that haven't been synced yet
+      // 4. Find dates that haven't been synced yet
       const unsyncedDates = historyDates.filter(date => !syncedDates.includes(date));
       
       if (unsyncedDates.length === 0) {
@@ -338,25 +349,43 @@ export default function DailyChallenge() {
         return;
       }
 
-      // 6. Calculate score to add (only unsynced dates)
+      // 5. Calculate score to add (only unsynced dates)
       const scoreToAdd = unsyncedDates.reduce((sum, date) => sum + scoreHistory[date], 0);
       
       if (scoreToAdd > 0) {
-        if (existing) {
+        // 6. Check what's already uploaded for this user (handle multiple entries)
+        const { data: existingEntries } = await supabase
+          .from('leaderboard')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('score', { ascending: false })
+          .limit(10);
+
+        const username = user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro";
+
+        if (existingEntries && existingEntries.length > 0) {
           // Update existing entry with accumulated score
+          const existing = existingEntries[0];
           await supabase
             .from('leaderboard')
             .update({ 
               score: existing.score + scoreToAdd,
               date: getTodayString(),
-              username: user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro"
+              username: username
             })
             .eq('id', existing.id);
           console.log(`Synced ${unsyncedDates.length} days, added ${scoreToAdd} points!`);
+          
+          // Clean up duplicates
+          if (existingEntries.length > 1) {
+            const duplicateIds = existingEntries.slice(1).map(e => e.id);
+            await supabase.from('leaderboard').delete().in('id', duplicateIds);
+            console.log(`Cleaned up ${duplicateIds.length} duplicate entries`);
+          }
         } else {
           // Create new entry
           await supabase.from('leaderboard').insert({
-            username: user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro",
+            username: username,
             score: scoreToAdd,
             date: getTodayString(),
             user_id: user.id
