@@ -99,18 +99,61 @@ export default function DailyChallenge() {
     return date in history;
   };
 
+  // Migrate old localStorage format to new history format
+  const migrateOldScores = () => {
+    const oldScore = localStorage.getItem("physio_today_score");
+    const oldDate = localStorage.getItem("physio_last_played");
+    
+    if (oldScore && oldDate) {
+      const history = getScoreHistory();
+      // Only migrate if this date isn't already in history
+      if (!(oldDate in history)) {
+        history[oldDate] = parseInt(oldScore);
+        localStorage.setItem("physio_score_history", JSON.stringify(history));
+        console.log(`Migrated old score: ${oldScore} for date ${oldDate}`);
+      }
+      // Clean up old keys
+      localStorage.removeItem("physio_today_score");
+    }
+  };
+
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setCurrentUser(data.user));
-    // Load total cumulative score on mount
-    setTotalScore(getTotalCumulativeScore());
+    // Migrate any old scores first
+    migrateOldScores();
+    
+    const initUser = async () => {
+      const { data } = await supabase.auth.getUser();
+      setCurrentUser(data.user);
+      
+      // If logged in, sync career total from database
+      if (data.user) {
+        const { data: leaderboardEntry } = await supabase
+          .from('leaderboard')
+          .select('score')
+          .eq('user_id', data.user.id)
+          .order('score', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (leaderboardEntry && leaderboardEntry.score) {
+          // Use the higher of: database score OR local cumulative score
+          const localTotal = getTotalCumulativeScore();
+          const dbScore = leaderboardEntry.score;
+          setTotalScore(Math.max(localTotal, dbScore));
+        } else {
+          setTotalScore(getTotalCumulativeScore());
+        }
+      } else {
+        setTotalScore(getTotalCumulativeScore());
+      }
+    };
+    
+    initUser();
   }, []);
 
   useEffect(() => {
     async function init() {
       const today = getTodayString();
-      
-      // Load cumulative score
-      setTotalScore(getTotalCumulativeScore());
       
       // A. Check if user FINISHED today (using new history system)
       if (hasPlayedOnDate(today)) {
