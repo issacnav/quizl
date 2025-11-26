@@ -22,3 +22,4 @@ CREATE INDEX IF NOT EXISTS idx_quiz_attempts_date ON quiz_attempts(date);
 CREATE INDEX IF NOT EXISTS idx_quiz_attempts_created_at ON quiz_attempts(created_at);
 
 
+

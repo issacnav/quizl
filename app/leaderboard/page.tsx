@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Trophy, Clock, Activity, ArrowLeft } from "lucide-react";
+import { Trophy, Activity, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/utils/supabase";
 import Link from "next/link";
@@ -15,12 +15,32 @@ export default function LeaderboardPage() {
   useEffect(() => {
     async function fetchLeaderboard() {
       setLoading(true);
+      
+      // Fetch all entries
       const { data } = await supabase
         .from('leaderboard')
         .select('*')
-        .order('score', { ascending: false })
-        .limit(20);
-      if (data) setLeaderboard(data);
+        .order('score', { ascending: false });
+      
+      if (data) {
+        // Deduplicate by user_id or username - keep highest score entry
+        const uniqueUsers = new Map();
+        
+        for (const entry of data) {
+          const key = entry.user_id || entry.username; // Use user_id if available, else username
+          
+          if (!uniqueUsers.has(key) || uniqueUsers.get(key).score < entry.score) {
+            uniqueUsers.set(key, entry);
+          }
+        }
+        
+        // Convert back to array and sort by score
+        const deduped = Array.from(uniqueUsers.values())
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 20);
+        
+        setLeaderboard(deduped);
+      }
       setLoading(false);
     }
     
@@ -64,8 +84,8 @@ export default function LeaderboardPage() {
                 <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-base sm:text-lg">Today's Top Physios</h3>
-                <p className="text-[10px] sm:text-xs text-zinc-400">Live Rankings • Updated in Real-time</p>
+                <h3 className="font-bold text-white text-base sm:text-lg">Career Leaderboard</h3>
+                <p className="text-[10px] sm:text-xs text-zinc-400">Cumulative Scores • Updated in Real-time</p>
               </div>
             </div>
             <Link href="/">
@@ -100,7 +120,7 @@ export default function LeaderboardPage() {
                 
                 return (
                   <motion.div
-                    key={i}
+                    key={user.id || i}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
@@ -166,11 +186,11 @@ export default function LeaderboardPage() {
           <div className="flex items-center justify-between text-xs text-zinc-500">
             <div className="flex items-center gap-2">
               <Activity className="w-3 h-3" />
-              <span>{leaderboard.length} players today</span>
+              <span>{leaderboard.length} players ranked</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-3 h-3" />
-              <span>Resets at midnight</span>
+              <Trophy className="w-3 h-3" />
+              <span>Play daily to climb!</span>
             </div>
           </div>
         </div>
@@ -178,4 +198,5 @@ export default function LeaderboardPage() {
     </main>
   );
 }
+
 

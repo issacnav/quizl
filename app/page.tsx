@@ -55,23 +55,67 @@ export default function DailyChallenge() {
   const [userName, setUserName] = useState("");
   const lottieRef = useRef<any>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [totalScore, setTotalScore] = useState(0); // Cumulative score across all days
 
   // Helper: Get Today's Date String (YYYY-MM-DD)
   const getTodayString = () => new Date().toISOString().split('T')[0];
 
+  // ============================================
+  // SCORE HISTORY SYSTEM - Persists across days
+  // ============================================
+  
+  // Get all scores from localStorage history
+  const getScoreHistory = (): Record<string, number> => {
+    try {
+      const historyStr = localStorage.getItem("physio_score_history");
+      return historyStr ? JSON.parse(historyStr) : {};
+    } catch {
+      return {};
+    }
+  };
+
+  // Save score for a specific date
+  const saveScoreForDate = (date: string, scoreValue: number) => {
+    const history = getScoreHistory();
+    history[date] = scoreValue;
+    localStorage.setItem("physio_score_history", JSON.stringify(history));
+  };
+
+  // Get score for a specific date
+  const getScoreForDate = (date: string): number | null => {
+    const history = getScoreHistory();
+    return history[date] ?? null;
+  };
+
+  // Calculate total cumulative score
+  const getTotalCumulativeScore = (): number => {
+    const history = getScoreHistory();
+    return Object.values(history).reduce((sum, s) => sum + s, 0);
+  };
+
+  // Check if user already played on a specific date
+  const hasPlayedOnDate = (date: string): boolean => {
+    const history = getScoreHistory();
+    return date in history;
+  };
+
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => setCurrentUser(data.user));
+    // Load total cumulative score on mount
+    setTotalScore(getTotalCumulativeScore());
   }, []);
 
   useEffect(() => {
     async function init() {
       const today = getTodayString();
       
-      // A. Check if user FINISHED today
-      const lastPlayed = localStorage.getItem("physio_last_played");
-      if (lastPlayed === today) {
-        const savedScore = localStorage.getItem("physio_today_score");
-        if (savedScore) setScore(parseInt(savedScore));
+      // Load cumulative score
+      setTotalScore(getTotalCumulativeScore());
+      
+      // A. Check if user FINISHED today (using new history system)
+      if (hasPlayedOnDate(today)) {
+        const savedScore = getScoreForDate(today);
+        if (savedScore !== null) setScore(savedScore);
         setView("ALREADY_PLAYED");
         return; // Stop here
       }
@@ -167,45 +211,71 @@ export default function DailyChallenge() {
     }, 1200);
   };
 
-  const saveScoreToDb = async (finalScore: number, user: any) => {
+  const saveScoreToDb = async (todayScore: number, user: any) => {
     if (!user) return;
     
-    // 1. Insert into Leaderboard
     const today = getTodayString();
-    await supabase.from('leaderboard').insert({
-      username: user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro",
-      score: finalScore,
-      date: today,
-      user_id: user.id // Assuming user_id column exists, otherwise remove or add it
-    });
-
-    // 2. Update Profile XP (Cumulative) - Optional but good for "Career Profile"
-    // We'll skip complex profile logic for now and just focus on the leaderboard entry
+    const username = user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro";
+    
+    // 1. Check if user already has an entry in leaderboard (by user_id if exists, else by username)
+    const { data: existing } = await supabase
+      .from('leaderboard')
+      .select('*')
+      .eq('user_id', user.id)
+      .maybeSingle();
+    
+    if (existing) {
+      // 2a. UPDATE existing entry - accumulate the score
+      const newTotalScore = existing.score + todayScore;
+      await supabase
+        .from('leaderboard')
+        .update({ 
+          score: newTotalScore,
+          date: today, // Update date to latest play
+          username: username // Update username in case it changed
+        })
+        .eq('id', existing.id);
+      
+      console.log(`Updated leaderboard: ${existing.score} + ${todayScore} = ${newTotalScore}`);
+    } else {
+      // 2b. INSERT new entry for first-time users
+      await supabase.from('leaderboard').insert({
+        username: username,
+        score: todayScore,
+        date: today,
+        user_id: user.id
+      });
+      
+      console.log(`New leaderboard entry created with score: ${todayScore}`);
+    }
   };
 
   const finishQuiz = async (finalScore: number) => {
     const today = getTodayString();
     
-    // 1. Save Final Status Locally
-    localStorage.setItem("physio_last_played", today);
-    localStorage.setItem("physio_today_score", finalScore.toString());
+    // 1. Save to score history (persists across days)
+    saveScoreForDate(today, finalScore);
+    
+    // 2. Update cumulative total
+    const newTotal = getTotalCumulativeScore();
+    setTotalScore(newTotal);
 
-    // 2. CLEAR the temporary progress so it doesn't conflict tomorrow
+    // 3. CLEAR the temporary progress so it doesn't conflict tomorrow
     localStorage.removeItem("physio_progress");
 
     setScore(finalScore);
     setView("COMPLETED");
 
-    // 3. LOG ATTEMPT ANONYMOUSLY (For Analytics)
+    // 4. LOG ATTEMPT ANONYMOUSLY (For Analytics)
     // We do this for EVERYONE who finishes, regardless of leaderboard
     await supabase.from('quiz_attempts').insert({
       score: finalScore,
       date: today
     });
 
-    // 4. AUTO-SAVE if logged in (Leaderboard)
+    // 5. AUTO-SAVE if logged in (Leaderboard)
     if (currentUser) {
-      saveScoreToDb(finalScore, currentUser);
+      await saveScoreToDb(finalScore, currentUser);
     } 
     // If NOT logged in, we show the "Sign in to Claim" UI
   };
@@ -214,11 +284,13 @@ export default function DailyChallenge() {
     // This is the manual "Enter Name" fallback for guest users
     if (!userName) return;
     
-    // Insert into Supabase
+    // Get cumulative score from history
+    const cumulativeScore = getTotalCumulativeScore();
     const today = getTodayString();
+    
     const { error } = await supabase.from('leaderboard').insert({ 
       username: userName, 
-      score: score,
+      score: cumulativeScore, // Use cumulative score
       date: today 
     });
     
@@ -233,7 +305,7 @@ export default function DailyChallenge() {
     router.push("/leaderboard");
   };
 
-  // Check for pending score after login redirect
+  // Check for pending scores after login redirect
   useEffect(() => {
     const checkPendingScore = async () => {
       // 1. Get User
@@ -241,25 +313,60 @@ export default function DailyChallenge() {
       if (!user) return;
       setCurrentUser(user);
 
-      // 2. Check if we just played today
-      const today = getTodayString();
-      const lastPlayed = localStorage.getItem("physio_last_played");
-      const localScore = localStorage.getItem("physio_today_score");
+      // 2. Get ALL local score history
+      const scoreHistory = getScoreHistory();
+      const historyDates = Object.keys(scoreHistory);
+      
+      if (historyDates.length === 0) return;
 
-      if (lastPlayed === today && localScore) {
-         // 3. Check if we already uploaded (to prevent duplicates)
-         // Note: You might need to adjust this query if 'user_id' column isn't in leaderboard yet
-         const { data: existing } = await supabase
-           .from('leaderboard')
-           .select('*')
-           .eq('username', user.user_metadata.full_name || user.email?.split('@')[0]) // Approximate check if user_id missing
-           .eq('date', today);
+      // 3. Check what's already uploaded for this user
+      const { data: existing } = await supabase
+        .from('leaderboard')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
 
-         if (!existing || existing.length === 0) {
-            // 4. UPLOAD PENDING SCORE
-            await saveScoreToDb(parseInt(localScore), user);
-            console.log("Pending score uploaded after login!");
-         }
+      // 4. Get the dates that are already synced (stored in localStorage)
+      const syncedDatesStr = localStorage.getItem("physio_synced_dates_" + user.id);
+      const syncedDates: string[] = syncedDatesStr ? JSON.parse(syncedDatesStr) : [];
+
+      // 5. Find dates that haven't been synced yet
+      const unsyncedDates = historyDates.filter(date => !syncedDates.includes(date));
+      
+      if (unsyncedDates.length === 0) {
+        console.log("All scores already synced!");
+        return;
+      }
+
+      // 6. Calculate score to add (only unsynced dates)
+      const scoreToAdd = unsyncedDates.reduce((sum, date) => sum + scoreHistory[date], 0);
+      
+      if (scoreToAdd > 0) {
+        if (existing) {
+          // Update existing entry with accumulated score
+          await supabase
+            .from('leaderboard')
+            .update({ 
+              score: existing.score + scoreToAdd,
+              date: getTodayString(),
+              username: user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro"
+            })
+            .eq('id', existing.id);
+          console.log(`Synced ${unsyncedDates.length} days, added ${scoreToAdd} points!`);
+        } else {
+          // Create new entry
+          await supabase.from('leaderboard').insert({
+            username: user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro",
+            score: scoreToAdd,
+            date: getTodayString(),
+            user_id: user.id
+          });
+          console.log(`Created leaderboard entry with ${scoreToAdd} points!`);
+        }
+        
+        // 7. Mark these dates as synced
+        const newSyncedDates = [...syncedDates, ...unsyncedDates];
+        localStorage.setItem("physio_synced_dates_" + user.id, JSON.stringify(newSyncedDates));
       }
     };
     
@@ -421,9 +528,20 @@ export default function DailyChallenge() {
             </div>
 
             <div className="p-4 sm:p-6 md:p-8 bg-zinc-900/50 border border-white/5 rounded-2xl mb-6 sm:mb-8 relative z-10 backdrop-blur-sm">
-                <div className="text-xs sm:text-sm text-zinc-500 uppercase tracking-widest mb-1">Your Score</div>
-                <div className="text-4xl sm:text-5xl md:text-6xl font-mono font-bold text-white tracking-tighter">
-                    {Math.floor(score / 1000)}
+                <div className="flex justify-center gap-6 sm:gap-10">
+                  <div className="text-center">
+                    <div className="text-xs sm:text-sm text-zinc-500 uppercase tracking-widest mb-1">Today</div>
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tracking-tighter">
+                        {Math.floor(score / 1000)}
+                    </div>
+                  </div>
+                  <div className="w-px bg-white/10" />
+                  <div className="text-center">
+                    <div className="text-xs sm:text-sm text-yellow-500/80 uppercase tracking-widest mb-1">Career Total</div>
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-yellow-400 tracking-tighter">
+                        {Math.floor(totalScore / 1000)}
+                    </div>
+                  </div>
                 </div>
             </div>
 
@@ -432,7 +550,7 @@ export default function DailyChallenge() {
                   <div className="space-y-3 w-full">
                     <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl text-center">
                       <p className="text-xs text-blue-200 mb-3 leading-relaxed">
-                        Sign in to save these <strong>{Math.floor(score/1000)} points</strong> to your career profile.
+                        Sign in to save your <strong>{Math.floor(totalScore/1000)} career points</strong> to the leaderboard.
                       </p>
                       <Button 
                         onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } })}

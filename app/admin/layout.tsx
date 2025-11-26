@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { List, BarChart3, ArrowLeft } from "lucide-react";
 
 interface NavItem {
@@ -43,7 +44,7 @@ export default function AdminLayout({
       <aside className="hidden md:flex fixed left-0 top-0 h-screen w-16 flex-col bg-zinc-950 border-r border-white/10 z-50">
         {/* Logo */}
         <div className="flex items-center justify-center h-16 border-b border-white/10">
-          <div className="h-7 w-7 bg-white rounded-md" />
+          <Image src="/icon.png" alt="Logo" width={28} height={28} className="rounded-md" />
         </div>
 
         {/* Navigation */}
@@ -89,7 +90,7 @@ export default function AdminLayout({
       {/* Mobile Header */}
       <header className="md:hidden fixed top-0 left-0 right-0 h-14 bg-zinc-950 border-b border-white/10 z-50 flex items-center justify-between px-4">
         <div className="flex items-center gap-3">
-          <div className="h-6 w-6 bg-white rounded" />
+          <Image src="/icon.png" alt="Logo" width={24} height={24} className="rounded" />
           <span className="font-semibold text-white">Admin</span>
         </div>
         <nav className="flex items-center gap-1">
