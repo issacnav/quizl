@@ -125,25 +125,23 @@ export default function DailyChallenge() {
       const { data } = await supabase.auth.getUser();
       setCurrentUser(data.user);
       
-      // If logged in, sync career total from database
+      // If logged in, fetch career total from the leaderboard (source of truth)
       if (data.user) {
         const { data: leaderboardEntry } = await supabase
           .from('leaderboard')
-          .select('score')
+          .select('total_score')
           .eq('user_id', data.user.id)
-          .order('score', { ascending: false })
-          .limit(1)
           .single();
         
-        if (leaderboardEntry && leaderboardEntry.score) {
-          // Use the higher of: database score OR local cumulative score
-          const localTotal = getTotalCumulativeScore();
-          const dbScore = leaderboardEntry.score;
-          setTotalScore(Math.max(localTotal, dbScore));
+        if (leaderboardEntry && leaderboardEntry.total_score) {
+          // Database is the source of truth for logged-in users
+          setTotalScore(leaderboardEntry.total_score);
         } else {
+          // New user or no DB entry yet - use local for display
           setTotalScore(getTotalCumulativeScore());
         }
       } else {
+        // Guest user - use local storage
         setTotalScore(getTotalCumulativeScore());
       }
     };
@@ -254,60 +252,45 @@ export default function DailyChallenge() {
     }, 1200);
   };
 
+  // ============================================
+  // LEDGER-BASED SAVE: Just INSERT into quiz_history
+  // The database trigger handles leaderboard updates automatically
+  // ============================================
   const saveScoreToDb = async (todayScore: number, user: any) => {
     if (!user) return;
     
     const today = getTodayString();
-    const username = user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro";
     
-    // 1. Check if user already has ANY entry in leaderboard (handle multiple entries)
-    const { data: existingEntries, error: fetchError } = await supabase
-      .from('leaderboard')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('score', { ascending: false }) // Get highest score first
-      .limit(10);
+    // Simply INSERT into quiz_history - the DB trigger handles the rest
+    const { error } = await supabase
+      .from('quiz_history')
+      .insert({
+        user_id: user.id,
+        date: today,
+        score: todayScore
+      });
     
-    if (fetchError) {
-      console.error("Error checking existing entries:", fetchError);
+    if (error) {
+      // Check if it's a duplicate key error (user already played today)
+      if (error.code === '23505') { // PostgreSQL unique_violation
+        console.log('Score already recorded for today - ignoring duplicate');
+        return;
+      }
+      console.error("Error saving to quiz_history:", error);
       return;
     }
     
-    if (existingEntries && existingEntries.length > 0) {
-      // 2a. User has existing entry(ies) - UPDATE the first one (highest score)
-      const existing = existingEntries[0];
-      const newTotalScore = existing.score + todayScore;
-      
-      await supabase
-        .from('leaderboard')
-        .update({ 
-          score: newTotalScore,
-          date: today,
-          username: username
-        })
-        .eq('id', existing.id);
-      
-      console.log(`Updated leaderboard: ${existing.score} + ${todayScore} = ${newTotalScore}`);
-      
-      // 2b. Clean up any duplicate entries (keep only the one we just updated)
-      if (existingEntries.length > 1) {
-        const duplicateIds = existingEntries.slice(1).map(e => e.id);
-        await supabase
-          .from('leaderboard')
-          .delete()
-          .in('id', duplicateIds);
-        console.log(`Cleaned up ${duplicateIds.length} duplicate entries`);
-      }
-    } else {
-      // 3. No existing entry - INSERT new entry for first-time users
-      await supabase.from('leaderboard').insert({
-        username: username,
-        score: todayScore,
-        date: today,
-        user_id: user.id
-      });
-      
-      console.log(`New leaderboard entry created with score: ${todayScore}`);
+    console.log(`Quiz history recorded: ${todayScore} points for ${today}`);
+    
+    // Fetch updated total from leaderboard (trigger has updated it)
+    const { data: leaderboardEntry } = await supabase
+      .from('leaderboard')
+      .select('total_score')
+      .eq('user_id', user.id)
+      .single();
+    
+    if (leaderboardEntry) {
+      setTotalScore(leaderboardEntry.total_score);
     }
   };
 
@@ -342,33 +325,21 @@ export default function DailyChallenge() {
   };
 
   const handleJoinLeaderboard = async () => {
-    // This is the manual "Enter Name" fallback for guest users
-    if (!userName) return;
-    
-    // Get cumulative score from history
-    const cumulativeScore = getTotalCumulativeScore();
-    const today = getTodayString();
-    
-    const { error } = await supabase.from('leaderboard').insert({ 
-      username: userName, 
-      score: cumulativeScore, // Use cumulative score
-      date: today 
-    });
-    
-    if (error) {
-      console.error("Error saving to leaderboard:", error);
-      alert("Failed to save score: " + error.message);
-      return;
-    }
-
-    // The real-time subscription will automatically update the leaderboard
+    // With ledger-based system, we require authentication
+    // Redirect to Google sign-in which will then sync scores
     setShowNameModal(false);
-    router.push("/leaderboard");
+    await supabase.auth.signInWithOAuth({ 
+      provider: 'google', 
+      options: { redirectTo: window.location.href } 
+    });
   };
 
-  // Check for pending scores after login redirect
+  // ============================================
+  // LEDGER-BASED SYNC: Upload all local history to quiz_history
+  // Database handles duplicates via UNIQUE constraint
+  // ============================================
   useEffect(() => {
-    const checkPendingScore = async () => {
+    const syncLocalHistoryToDb = async () => {
       // 1. Get User
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
@@ -380,69 +351,51 @@ export default function DailyChallenge() {
       
       if (historyDates.length === 0) return;
 
-      // 3. Get the dates that are already synced (stored in localStorage)
-      const syncedDatesStr = localStorage.getItem("physio_synced_dates_" + user.id);
-      const syncedDates: string[] = syncedDatesStr ? JSON.parse(syncedDatesStr) : [];
+      console.log(`Syncing ${historyDates.length} local quiz records...`);
 
-      // 4. Find dates that haven't been synced yet
-      const unsyncedDates = historyDates.filter(date => !syncedDates.includes(date));
-      
-      if (unsyncedDates.length === 0) {
-        console.log("All scores already synced!");
-        return;
-      }
+      // 3. Attempt to insert each day's score
+      // The UNIQUE(user_id, date) constraint will reject duplicates safely
+      let successCount = 0;
+      let duplicateCount = 0;
 
-      // 5. Calculate score to add (only unsynced dates)
-      const scoreToAdd = unsyncedDates.reduce((sum, date) => sum + scoreHistory[date], 0);
-      
-      if (scoreToAdd > 0) {
-        // 6. Check what's already uploaded for this user (handle multiple entries)
-        const { data: existingEntries } = await supabase
-          .from('leaderboard')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('score', { ascending: false })
-          .limit(10);
+      for (const date of historyDates) {
+        const { error } = await supabase
+          .from('quiz_history')
+          .insert({
+            user_id: user.id,
+            date: date,
+            score: scoreHistory[date]
+          });
 
-        const username = user.user_metadata.full_name || user.email?.split('@')[0] || "Physio Pro";
-
-        if (existingEntries && existingEntries.length > 0) {
-          // Update existing entry with accumulated score
-          const existing = existingEntries[0];
-          await supabase
-            .from('leaderboard')
-            .update({ 
-              score: existing.score + scoreToAdd,
-              date: getTodayString(),
-              username: username
-            })
-            .eq('id', existing.id);
-          console.log(`Synced ${unsyncedDates.length} days, added ${scoreToAdd} points!`);
-          
-          // Clean up duplicates
-          if (existingEntries.length > 1) {
-            const duplicateIds = existingEntries.slice(1).map(e => e.id);
-            await supabase.from('leaderboard').delete().in('id', duplicateIds);
-            console.log(`Cleaned up ${duplicateIds.length} duplicate entries`);
+        if (error) {
+          if (error.code === '23505') { // unique_violation - already synced
+            duplicateCount++;
+          } else {
+            console.error(`Error syncing ${date}:`, error);
           }
         } else {
-          // Create new entry
-          await supabase.from('leaderboard').insert({
-            username: username,
-            score: scoreToAdd,
-            date: getTodayString(),
-            user_id: user.id
-          });
-          console.log(`Created leaderboard entry with ${scoreToAdd} points!`);
+          successCount++;
         }
-        
-        // 7. Mark these dates as synced
-        const newSyncedDates = [...syncedDates, ...unsyncedDates];
-        localStorage.setItem("physio_synced_dates_" + user.id, JSON.stringify(newSyncedDates));
+      }
+
+      console.log(`Sync complete: ${successCount} new, ${duplicateCount} already synced`);
+
+      // 4. Fetch the authoritative total from leaderboard
+      if (successCount > 0 || duplicateCount > 0) {
+        const { data: leaderboardEntry } = await supabase
+          .from('leaderboard')
+          .select('total_score')
+          .eq('user_id', user.id)
+          .single();
+
+        if (leaderboardEntry) {
+          setTotalScore(leaderboardEntry.total_score);
+          console.log(`Career total from DB: ${leaderboardEntry.total_score}`);
+        }
       }
     };
     
-    checkPendingScore();
+    syncLocalHistoryToDb();
   }, []);
 
   // --- FEEDBACK HELPER ---

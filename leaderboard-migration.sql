@@ -21,3 +21,4 @@ CREATE POLICY "Allow authenticated update on own leaderboard entry" ON leaderboa
 -- ALTER TABLE leaderboard ADD CONSTRAINT unique_user_id UNIQUE (user_id);
 
 
+

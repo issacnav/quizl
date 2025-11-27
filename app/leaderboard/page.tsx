@@ -7,39 +7,39 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/utils/supabase";
 import Link from "next/link";
 
+// Avatar icons from /public/avatars folder
+const AVATARS = [
+  '/avatars/user1.png',
+  '/avatars/user2.png',
+  '/avatars/user3.png',
+  '/avatars/user4.png',
+  '/avatars/user5.png',
+];
+
+// Get avatar based on rank - ensures first 5 users all have unique avatars
+const getAvatarForRank = (rank: number) => {
+  return AVATARS[rank % AVATARS.length];
+};
+
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch Leaderboard with Real-time Updates
+  // With ledger-based architecture, user_id is PRIMARY KEY so no duplicates possible
   useEffect(() => {
     async function fetchLeaderboard() {
       setLoading(true);
       
-      // Fetch all entries
+      // Fetch all entries - already deduplicated by schema (user_id is PK)
       const { data } = await supabase
         .from('leaderboard')
-        .select('*')
-        .order('score', { ascending: false });
+        .select('user_id, username, avatar_url, total_score, games_played, last_played_at')
+        .order('total_score', { ascending: false })
+        .limit(50);
       
       if (data) {
-        // Deduplicate by user_id or username - keep highest score entry
-        const uniqueUsers = new Map();
-        
-        for (const entry of data) {
-          const key = entry.user_id || entry.username; // Use user_id if available, else username
-          
-          if (!uniqueUsers.has(key) || uniqueUsers.get(key).score < entry.score) {
-            uniqueUsers.set(key, entry);
-          }
-        }
-        
-        // Convert back to array and sort by score
-        const deduped = Array.from(uniqueUsers.values())
-          .sort((a, b) => b.score - a.score)
-          .slice(0, 20);
-        
-        setLeaderboard(deduped);
+        setLeaderboard(data);
       }
       setLoading(false);
     }
@@ -119,8 +119,8 @@ export default function LeaderboardPage() {
                 const isTopThree = i < 3;
                 
                 return (
-                  <motion.div
-                    key={user.id || i}
+                    <motion.div
+                    key={user.user_id || i}
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.05 }}
@@ -145,14 +145,21 @@ export default function LeaderboardPage() {
                         #{i + 1}
                       </div>
 
-                      {/* Username */}
-                      <div className="flex-1 min-w-0">
-                        <div className={`font-semibold text-sm sm:text-base truncate ${isTopThree ? 'text-white' : 'text-zinc-300'} group-hover:text-white transition-colors`}>
-                          {user.username || user.name}
+                      {/* Avatar + Username */}
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <img 
+                          src={getAvatarForRank(i)} 
+                          alt="" 
+                          className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-white/10 object-cover"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <div className={`font-semibold text-sm sm:text-base truncate ${isTopThree ? 'text-white' : 'text-zinc-300'} group-hover:text-white transition-colors`}>
+                            {user.username}
+                          </div>
+                          <div className="text-[10px] sm:text-xs text-zinc-500">
+                            {user.games_played} {user.games_played === 1 ? 'game' : 'games'} played
+                          </div>
                         </div>
-                        {isTopThree && (
-                          <div className="text-[10px] sm:text-xs text-yellow-500/70 font-medium">Top Performer</div>
-                        )}
                       </div>
 
                       {/* Score Badge */}
@@ -164,7 +171,7 @@ export default function LeaderboardPage() {
                         }
                         group-hover:scale-110 transition-transform
                       `}>
-                        {Math.floor(user.score / 1000)} pts
+                        {Math.floor(user.total_score / 1000)} pts
                       </div>
                     </div>
 
