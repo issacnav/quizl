@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Trophy, Activity, ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Trophy, Activity, ChevronLeft } from "lucide-react";
 import { supabase } from "@/utils/supabase";
 import Link from "next/link";
 
@@ -21,191 +20,232 @@ const getAvatarForRank = (rank: number) => {
   return AVATARS[rank % AVATARS.length];
 };
 
+// Rank colors for top 3
+const getRankStyle = (rank: number) => {
+  if (rank === 0) return { color: 'text-yellow-400', bg: 'from-yellow-500/15' }; // Gold
+  if (rank === 1) return { color: 'text-zinc-300', bg: 'from-zinc-400/10' };     // Silver
+  if (rank === 2) return { color: 'text-amber-600', bg: 'from-amber-600/10' };   // Bronze
+  return { color: 'text-zinc-500', bg: '' };
+};
+
+// Animation variants for staggered entrance
+const listContainer = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const listItem = {
+  hidden: { opacity: 0, y: 20, filter: "blur(8px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)" },
+};
+
+// Fake users for preview
+const FAKE_USERS = [
+  { user_id: 'fake-1', username: 'Dr. Sarah Chen', total_score: 48500, games_played: 12 },
+  { user_id: 'fake-2', username: 'PhysioMaster', total_score: 42000, games_played: 10 },
+  { user_id: 'fake-3', username: 'Alex Thompson', total_score: 38750, games_played: 9 },
+  { user_id: 'fake-4', username: 'MuscleMedic', total_score: 31200, games_played: 7 },
+  { user_id: 'fake-5', username: 'RehabRookie', total_score: 24500, games_played: 6 },
+  { user_id: 'fake-6', username: 'JointJunkie', total_score: 18000, games_played: 4 },
+];
+
 export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch Leaderboard with Real-time Updates
-  // With ledger-based architecture, user_id is PRIMARY KEY so no duplicates possible
   useEffect(() => {
     async function fetchLeaderboard() {
       setLoading(true);
       
-      // Fetch all entries - already deduplicated by schema (user_id is PK)
       const { data } = await supabase
         .from('leaderboard')
         .select('user_id, username, avatar_url, total_score, games_played, last_played_at')
         .order('total_score', { ascending: false })
         .limit(50);
       
-      if (data) {
-        setLeaderboard(data);
-      }
+      // PREVIEW MODE: Always show fake users to test design
+      // TODO: Remove this and use real data when done testing
+      setLeaderboard(FAKE_USERS);
+      
+      // Uncomment below to use real data:
+      // if (data && data.length > 0) {
+      //   setLeaderboard(data);
+      // }
       setLoading(false);
     }
     
-    // Initial fetch
     fetchLeaderboard();
 
-    // Set up real-time subscription
     const channel = supabase
       .channel('leaderboard_changes')
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'leaderboard' },
-        (payload) => {
-          console.log('Leaderboard change detected:', payload);
-          // Re-fetch the entire leaderboard when any change happens
-          fetchLeaderboard();
-        }
+        () => fetchLeaderboard()
       )
       .subscribe();
 
-    // Cleanup subscription on unmount
     return () => {
       supabase.removeChannel(channel);
     };
   }, []);
 
   return (
-    <main className="w-full px-4 sm:px-6 relative flex flex-col justify-center items-center mx-auto min-h-screen pt-2 transition-all duration-500 max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl">
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+    <main className="w-full px-4 sm:px-6 relative flex flex-col justify-center items-center mx-auto min-h-screen py-8">
+      {/* Ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-yellow-500/5 blur-[150px] rounded-full pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full bg-zinc-900/40 backdrop-blur-xl border border-white/10 rounded-2xl overflow-hidden shadow-2xl"
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-2xl bg-gradient-to-b from-zinc-900 to-zinc-950 backdrop-blur-xl border border-white/[0.08] rounded-2xl overflow-hidden shadow-2xl"
       >
-        {/* Header with Trophy Icon */}
-        <div className="p-4 sm:p-6 border-b border-white/10 bg-gradient-to-r from-yellow-500/10 via-white/5 to-blue-500/10">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-yellow-500/20 flex items-center justify-center">
-                <Trophy className="w-4 h-4 sm:w-5 sm:h-5 text-yellow-500" />
+        {/* Header */}
+        <div className="p-5 sm:p-6">
+          <div className="flex items-center gap-4">
+            {/* Back Button - Top Left */}
+            <Link href="/">
+              <button className="w-9 h-9 rounded-full bg-white/5 hover:bg-white/10 border border-white/[0.08] flex items-center justify-center text-zinc-400 hover:text-white transition-all duration-200">
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            </Link>
+            
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500/20 to-yellow-600/10 flex items-center justify-center border border-yellow-500/20">
+                <Trophy className="w-5 h-5 text-yellow-500" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-base sm:text-lg">Career Leaderboard</h3>
-                <p className="text-[10px] sm:text-xs text-zinc-400">Cumulative Scores • Updated in Real-time</p>
+                <h1 className="font-semibold text-white text-lg tracking-tight">Leaderboard</h1>
+                <p className="text-xs text-zinc-500">Updated in real-time</p>
               </div>
             </div>
-            <Link href="/">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-8 text-xs hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
-              >
-                <ArrowLeft className="w-3 h-3 mr-1" />
-                Back
-              </Button>
-            </Link>
           </div>
         </div>
 
+        {/* Divider */}
+        <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
         {/* Leaderboard List */}
-        <div className="p-3 sm:p-4 max-h-[400px] sm:max-h-[500px] overflow-y-auto">
+        <div className="p-4 sm:p-5 max-h-[480px] overflow-y-auto">
           {loading ? (
-            <div className="text-center py-12 text-zinc-500">
-              <Activity className="w-12 h-12 mx-auto mb-3 opacity-30 animate-pulse" />
-              <p className="text-sm">Loading leaderboard...</p>
+            <div className="text-center py-16 text-zinc-500">
+              <Activity className="w-10 h-10 mx-auto mb-3 opacity-30 animate-pulse" />
+              <p className="text-sm">Loading...</p>
             </div>
           ) : leaderboard.length === 0 ? (
-            <div className="text-center py-12 text-zinc-500">
-              <Activity className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <div className="text-center py-16 text-zinc-500">
+              <Activity className="w-10 h-10 mx-auto mb-3 opacity-20" />
               <p className="text-sm">No entries yet. Be the first!</p>
             </div>
           ) : (
-            <div className="space-y-2">
+            <motion.div 
+              variants={listContainer}
+              initial="hidden"
+              animate="show"
+              className="space-y-1.5"
+            >
               {leaderboard.map((user, i) => {
                 const isTopThree = i < 3;
+                const rankStyle = getRankStyle(i);
                 
                 return (
-                    <motion.div
+                  <motion.div
                     key={user.user_id || i}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                    variants={listItem}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
                     className={`
-                      group relative flex items-center justify-between p-3 sm:p-4 rounded-xl transition-all duration-300
-                      ${isTopThree 
-                        ? 'bg-gradient-to-r from-yellow-500/10 to-transparent border border-yellow-500/20 hover:border-yellow-500/40' 
-                        : 'bg-zinc-800/30 border border-transparent hover:border-white/10 hover:bg-zinc-800/50'
+                      group relative overflow-hidden flex items-center gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl 
+                      transition-all duration-300 ease-out
+                      hover:scale-[1.02] hover:border-white/10
+                      ${i === 0 
+                        ? `bg-gradient-to-r ${rankStyle.bg} to-transparent border border-white/[0.06] border-t-yellow-500/25` 
+                        : isTopThree 
+                          ? `bg-gradient-to-r ${rankStyle.bg} to-transparent border border-white/[0.06]` 
+                          : 'hover:bg-white/[0.04] border border-transparent'
                       }
-                      cursor-pointer transform hover:scale-[1.02] hover:shadow-lg
                     `}
                   >
-                    {/* Rank Badge */}
-                    <div className="flex items-center gap-2 sm:gap-4 flex-1">
-                      <div className={`
-                        flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg font-bold text-xs sm:text-sm
-                        ${isTopThree 
-                          ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
-                          : 'bg-zinc-700/50 text-zinc-500 border border-zinc-600/30'
-                        }
-                      `}>
-                        #{i + 1}
-                      </div>
+                    {/* Golden Shimmer - Rank #1 Only */}
+                    {i === 0 && (
+                      <motion.div
+                        initial={{ x: "-100%" }}
+                        animate={{ x: "200%" }}
+                        transition={{ 
+                          repeat: Infinity, 
+                          duration: 2.5, 
+                          ease: "linear", 
+                          repeatDelay: 3 
+                        }}
+                        className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-r from-transparent via-yellow-500/10 to-transparent skew-x-12"
+                      />
+                    )}
 
-                      {/* Avatar + Username */}
-                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white/10 overflow-hidden flex-shrink-0 bg-white">
-                          <img 
-                            src={getAvatarForRank(i)} 
-                            alt="" 
-                            className="w-full h-full object-cover object-center scale-110"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className={`font-semibold text-sm sm:text-base truncate ${isTopThree ? 'text-white' : 'text-zinc-300'} group-hover:text-white transition-colors`}>
-                            {user.username}
-                          </div>
-                          <div className="text-[10px] sm:text-xs text-zinc-500">
-                            {user.games_played} {user.games_played === 1 ? 'game' : 'games'} played
-                          </div>
-                        </div>
-                      </div>
+                    {/* Rank - Clean circular badge */}
+                    <div className={`
+                      relative z-10 w-8 h-8 rounded-full flex items-center justify-center font-mono font-bold text-sm
+                      ${isTopThree 
+                        ? `${rankStyle.color} bg-white/[0.06]` 
+                        : 'text-zinc-600 bg-white/[0.03]'
+                      }
+                    `}>
+                      {i + 1}
+                    </div>
 
-                      {/* Score Badge */}
-                      <div className={`
-                        px-2 py-1.5 sm:px-4 sm:py-2 rounded-lg font-mono font-bold text-xs sm:text-sm
-                        ${isTopThree 
-                          ? 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30' 
-                          : 'bg-zinc-700/50 text-zinc-400 border border-zinc-600/30'
-                        }
-                        group-hover:scale-110 transition-transform
-                      `}>
-                        {Math.floor(user.total_score / 1000)} pts
+                    {/* Avatar */}
+                    <div className="relative z-10 w-9 h-9 sm:w-10 sm:h-10 rounded-full overflow-hidden flex-shrink-0 bg-zinc-800">
+                      <img 
+                        src={getAvatarForRank(i)} 
+                        alt="" 
+                        className="w-full h-full object-cover object-center scale-125"
+                      />
+                    </div>
+
+                    {/* Name & Games */}
+                    <div className="relative z-10 flex-1 min-w-0">
+                      <div className={`font-medium text-sm sm:text-base truncate ${isTopThree ? 'text-white' : 'text-zinc-300'}`}>
+                        {user.username}
+                      </div>
+                      <div className="text-[11px] text-zinc-500">
+                        {user.games_played} {user.games_played === 1 ? 'game' : 'games'}
                       </div>
                     </div>
 
-                    {/* Animated Shine Effect for Top 3 */}
-                    {isTopThree && (
-                      <div className="absolute inset-0 rounded-xl overflow-hidden pointer-events-none">
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                      </div>
-                    )}
+                    {/* Score - Ghost style badge */}
+                    <div className={`
+                      relative z-10 px-3 py-1.5 rounded-full font-mono text-xs sm:text-sm font-medium
+                      ${isTopThree 
+                        ? `border ${i === 0 ? 'border-yellow-500/30 text-yellow-400' : i === 1 ? 'border-zinc-400/20 text-zinc-300' : 'border-amber-600/30 text-amber-500'} bg-transparent` 
+                        : 'border border-white/[0.06] text-zinc-500 bg-transparent'
+                      }
+                    `}>
+                      {Math.floor(user.total_score / 1000)} pts
+                    </div>
                   </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           )}
         </div>
 
-        {/* Footer Stats */}
-        <div className="p-4 border-t border-white/10 bg-white/5">
-          <div className="flex items-center justify-between text-xs text-zinc-500">
-            <div className="flex items-center gap-2">
+        {/* Footer - Seamless */}
+        <div className="px-5 py-4 border-t border-white/[0.06]">
+          <div className="flex items-center justify-between text-[11px] text-zinc-600">
+            <div className="flex items-center gap-1.5">
               <Activity className="w-3 h-3" />
-              <span>{leaderboard.length} players ranked</span>
+              <span>{leaderboard.length} ranked</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Trophy className="w-3 h-3" />
-              <span>Play daily to climb!</span>
-            </div>
+            <span className="text-zinc-700">Play daily to climb</span>
           </div>
         </div>
       </motion.div>
     </main>
   );
 }
-
-
