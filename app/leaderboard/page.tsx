@@ -147,11 +147,13 @@ export default function LeaderboardPage() {
 
                       {/* Avatar + Username */}
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <img 
-                          src={getAvatarForRank(i)} 
-                          alt="" 
-                          className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border border-white/10 object-cover"
-                        />
+                        <div className="relative w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white/10 overflow-hidden flex-shrink-0 bg-white">
+                          <img 
+                            src={getAvatarForRank(i)} 
+                            alt="" 
+                            className="w-full h-full object-cover object-center scale-110"
+                          />
+                        </div>
                         <div className="flex-1 min-w-0">
                           <div className={`font-semibold text-sm sm:text-base truncate ${isTopThree ? 'text-white' : 'text-zinc-300'} group-hover:text-white transition-colors`}>
                             {user.username}
