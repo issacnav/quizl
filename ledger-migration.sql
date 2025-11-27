@@ -220,3 +220,4 @@ GRANT EXECUTE ON FUNCTION get_user_total_score(UUID) TO authenticated;
 -- 4. No manual score calculation needed on frontend!
 --
 
+

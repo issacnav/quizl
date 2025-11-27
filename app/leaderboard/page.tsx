@@ -70,14 +70,10 @@ export default function LeaderboardPage() {
         .order('total_score', { ascending: false })
         .limit(50);
       
-      // PREVIEW MODE: Always show fake users to test design
-      // TODO: Remove this and use real data when done testing
-      setLeaderboard(FAKE_USERS);
-      
-      // Uncomment below to use real data:
-      // if (data && data.length > 0) {
-      //   setLeaderboard(data);
-      // }
+      // Use real data from Supabase
+      if (data) {
+        setLeaderboard(data);
+      }
       setLoading(false);
     }
     
