@@ -452,15 +452,21 @@ export default function DailyChallenge() {
     // For now: Fetch past 100, shuffle client side, take N.
     
     const today = getTodayString();
+    // Fetch questions where date <= today (including today if you want, but usually practice is past)
+    // But user said "more than 80 questions" - if they are all in the future (e.g. Dec 2025),
+    // lt('date', today) might return 0 results if today is Nov 2025.
+    // Let's remove the date filter for now to allow testing with ALL seeded questions, 
+    // or change logic to just pick random non-daily questions if that was the intent.
+    // Assuming we want "The Vault" to be ALL questions available in DB for practice.
+    
     const { data, error } = await supabase
       .from('daily_quiz')
       .select('*')
-      .lt('date', today)
-      .order('date', { ascending: false })
-      .limit(50); // Fetch last 50 questions to sample from
+      // .lt('date', today)  <-- Removed to allow access to all 80+ questions for practice
+      .limit(100); 
 
     if (error || !data || data.length === 0) {
-       alert("No past questions available in The Vault yet!");
+       alert("No questions available in The Vault yet!");
        return;
     }
 
@@ -537,36 +543,53 @@ export default function DailyChallenge() {
               <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6 space-y-8 backdrop-blur-sm">
                  
                  {/* Slider Section */}
-                 <div className="space-y-4">
+                 <div className="space-y-8 py-4">
                     <div className="flex justify-between items-center">
                        <label className="text-sm font-medium text-zinc-300">Session Length</label>
-                       <span className="text-amber-400 font-mono font-bold text-lg">{practiceCount} Qs</span>
+                       <span className="text-amber-400 font-mono font-bold text-2xl">{practiceCount} Qs</span>
                     </div>
                     
-                    <Slider 
-                       defaultValue={[5]} 
-                       max={20} 
-                       min={5} 
-                       step={5} 
-                       onValueChange={(vals) => setPracticeCount(vals[0])}
-                       className="py-2"
-                    />
+                    <div className="px-2">
+                        <Slider 
+                           defaultValue={[5]} 
+                           max={50} 
+                           min={5} 
+                           step={5} 
+                           onValueChange={(vals) => setPracticeCount(vals[0])}
+                           className="py-4 cursor-pointer"
+                        />
+                    </div>
                     
-                    <p className="text-xs text-zinc-500 text-center">
-                       {practiceCount === 5 && "Quick Review • ~2 mins"}
-                       {practiceCount === 10 && "Standard Set • ~5 mins"}
-                       {practiceCount === 15 && "Extended • ~8 mins"}
-                       {practiceCount === 20 && "Deep Dive • ~12 mins"}
+                    <div className="grid grid-cols-4 gap-2 text-center">
+                        {[5, 10, 20, 50].map((val) => (
+                            <button 
+                                key={val}
+                                onClick={() => setPracticeCount(val)}
+                                className={`text-xs py-2 rounded-lg border transition-all ${
+                                    practiceCount === val 
+                                    ? "bg-amber-500/20 border-amber-500/50 text-amber-300" 
+                                    : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700"
+                                }`}
+                            >
+                                {val} Qs
+                            </button>
+                        ))}
+                    </div>
+
+                    <p className="text-xs text-zinc-500 text-center italic">
+                       {practiceCount <= 10 && "Quick warmup set."}
+                       {practiceCount > 10 && practiceCount <= 25 && "Solid practice session."}
+                       {practiceCount > 25 && "Marathon mode. Good luck!"}
                     </p>
                  </div>
 
                  {/* Actions */}
-                 <div className="space-y-3">
+                 <div className="space-y-3 pt-2">
                     <Button 
                        onClick={startPractice}
-                       className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold h-12 text-base"
+                       className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold h-14 text-lg shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_30px_rgba(245,158,11,0.4)] transition-all"
                     >
-                       Open The Vault
+                       Enter The Vault
                     </Button>
                     <Button 
                        variant="ghost" 
@@ -713,12 +736,11 @@ export default function DailyChallenge() {
                     
                     {/* Vault Entry Point */}
                     <Button 
-                       variant="outline" 
-                       className="w-full border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 text-xs h-9"
+                       className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs h-10 mt-2 shadow-lg shadow-amber-900/20"
                        onClick={() => setView("PRACTICE_CONFIG")}
                     >
-                       <Archive className="w-3 h-3 mr-2" />
-                       Enter The Vault (Practice)
+                       <Archive className="w-4 h-4 mr-2" />
+                       Enter The Vault
                     </Button>
                   </div>
                 ) : (
@@ -738,12 +760,11 @@ export default function DailyChallenge() {
 
                     {/* Vault Entry Point */}
                     <Button 
-                       variant="outline" 
-                       className="w-full border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 text-xs h-9"
+                       className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs h-10 mt-2 shadow-lg shadow-amber-900/20"
                        onClick={() => setView("PRACTICE_CONFIG")}
                     >
-                       <Archive className="w-3 h-3 mr-2" />
-                       Enter The Vault (Practice)
+                       <Archive className="w-4 h-4 mr-2" />
+                       Enter The Vault
                     </Button>
                   </div>
                 )}
