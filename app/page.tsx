@@ -2,20 +2,21 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, X, Trophy, ArrowRight, Loader2, Clock, Activity } from "lucide-react";
+import { Check, X, Trophy, ArrowRight, Loader2, Clock, Activity, Book, RotateCcw, Archive } from "lucide-react";
 import Lottie from "lottie-react";
 import hiAnimation from "@/components/Hi.json";
 import deadAnimation from "@/components/Dead.json";
 import cryAnimation from "@/components/Cry.json";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/utils/supabase";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 // --- Types ---
-type ViewState = "LOADING" | "QUIZ" | "COMPLETED" | "ALREADY_PLAYED";
+type ViewState = "LOADING" | "QUIZ" | "COMPLETED" | "ALREADY_PLAYED" | "PRACTICE_CONFIG" | "PRACTICE_COMPLETED";
 
 // The "Linear" Blur-In Effect
 const blurIn = {
@@ -41,6 +42,8 @@ export default function DailyChallenge() {
   // App State
   const [view, setView] = useState<ViewState>("LOADING");
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
+  const [isPracticeMode, setIsPracticeMode] = useState(false);
+  const [practiceCount, setPracticeCount] = useState(5);
   
   // Quiz Logic
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -234,22 +237,36 @@ export default function DailyChallenge() {
 
     setTimeout(() => {
       if (currentIndex < questions.length - 1) {
-        // --- SAVE PROGRESS HERE ---
+        // --- SAVE PROGRESS HERE (Only for Daily) ---
         const nextIndex = currentIndex + 1;
-        localStorage.setItem("physio_progress", JSON.stringify({
-            date: getTodayString(),
-            index: nextIndex,
-            score: newTotalScore
-        }));
+        
+        if (!isPracticeMode) {
+           localStorage.setItem("physio_progress", JSON.stringify({
+               date: getTodayString(),
+               index: nextIndex,
+               score: newTotalScore
+           }));
+        }
         
         setCurrentIndex(nextIndex);
         setSelectedOption(null);
         // Timer resets via useEffect
       } else {
         // Quiz Finished
-        finishQuiz(newTotalScore);
+        if (isPracticeMode) {
+           finishPractice(newTotalScore);
+        } else {
+           finishQuiz(newTotalScore);
+        }
       }
     }, 1200);
+  };
+
+  // --- PRACTICE FINISH LOGIC ---
+  const finishPractice = (finalScore: number) => {
+     // No saving to leaderboard or local history
+     setScore(finalScore);
+     setView("PRACTICE_COMPLETED");
   };
 
   // ============================================
@@ -423,11 +440,46 @@ export default function DailyChallenge() {
     exit: { x: -50, opacity: 0 }
   };
 
+  // --- PRACTICE MODE HELPERS ---
+  const startPractice = async () => {
+    setQuestions([]); // Clear previous
+    setIsPracticeMode(true);
+    
+    // Fetch past questions from Supabase
+    // Logic: Date < TODAY, limit by practiceCount
+    // Since we want random, we can't easily do random() in Supabase without a function
+    // So we'll fetch a larger batch of past IDs and pick randomly, or just fetch recent past.
+    // For now: Fetch past 100, shuffle client side, take N.
+    
+    const today = getTodayString();
+    const { data, error } = await supabase
+      .from('daily_quiz')
+      .select('*')
+      .lt('date', today)
+      .order('date', { ascending: false })
+      .limit(50); // Fetch last 50 questions to sample from
+
+    if (error || !data || data.length === 0) {
+       alert("No past questions available in The Vault yet!");
+       return;
+    }
+
+    // Shuffle and slice
+    const shuffled = [...data].sort(() => 0.5 - Math.random());
+    const selected = shuffled.slice(0, practiceCount);
+    
+    setQuestions(selected);
+    setCurrentIndex(0);
+    setScore(0);
+    setSelectedOption(null);
+    setView("QUIZ");
+  };
+
   return (
     <main className="w-full px-4 sm:px-6 relative flex flex-col justify-center items-center mx-auto min-h-screen pt-2 transition-all duration-500 max-w-full sm:max-w-xl md:max-w-2xl lg:max-w-3xl">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      {/* --- SITE HEADER (Only on first question) --- */}
+      {/* --- SITE HEADER (Only on first question of QUIZ) --- */}
       <AnimatePresence>
         {currentIndex === 0 && view === "QUIZ" && (
           <motion.div 
@@ -440,13 +492,15 @@ export default function DailyChallenge() {
             <div className="flex items-center gap-3 mb-2">
               {/* Text with Linear Gradient */}
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40">
-                PhysioQuiz
+                {isPracticeMode ? "The Vault" : "PhysioQuiz"}
               </h1>
             </div>
             
             {/* Subtitle tag */}
-            <div className="px-4 py-1.5 rounded-full border border-white/5 bg-white/5 text-sm font-medium text-zinc-400 tracking-widest uppercase">
-              Test Your Knowledge
+            <div className={`px-4 py-1.5 rounded-full border bg-white/5 text-sm font-medium tracking-widest uppercase ${
+               isPracticeMode ? "border-amber-500/20 text-amber-400" : "border-white/5 text-zinc-400"
+            }`}>
+              {isPracticeMode ? "Practice Session" : "Test Your Knowledge"}
             </div>
           </motion.div>
         )}
@@ -464,6 +518,68 @@ export default function DailyChallenge() {
           </motion.div>
         )}
 
+        {/* --- VIEW: PRACTICE CONFIG (THE VAULT) --- */}
+        {view === "PRACTICE_CONFIG" && (
+           <motion.div
+             initial={{ opacity: 0, scale: 0.95 }}
+             animate={{ opacity: 1, scale: 1 }}
+             exit={{ opacity: 0, scale: 0.95 }}
+             className="w-full max-w-md mx-auto"
+           >
+              <div className="text-center mb-8">
+                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-500 mb-4 border border-amber-500/20">
+                    <Archive className="w-8 h-8" />
+                 </div>
+                 <h2 className="text-2xl font-bold text-white mb-2">The Vault</h2>
+                 <p className="text-zinc-400 text-sm">Access the archive of past clinical questions.</p>
+              </div>
+
+              <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6 space-y-8 backdrop-blur-sm">
+                 
+                 {/* Slider Section */}
+                 <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                       <label className="text-sm font-medium text-zinc-300">Session Length</label>
+                       <span className="text-amber-400 font-mono font-bold text-lg">{practiceCount} Qs</span>
+                    </div>
+                    
+                    <Slider 
+                       defaultValue={[5]} 
+                       max={20} 
+                       min={5} 
+                       step={5} 
+                       onValueChange={(vals) => setPracticeCount(vals[0])}
+                       className="py-2"
+                    />
+                    
+                    <p className="text-xs text-zinc-500 text-center">
+                       {practiceCount === 5 && "Quick Review • ~2 mins"}
+                       {practiceCount === 10 && "Standard Set • ~5 mins"}
+                       {practiceCount === 15 && "Extended • ~8 mins"}
+                       {practiceCount === 20 && "Deep Dive • ~12 mins"}
+                    </p>
+                 </div>
+
+                 {/* Actions */}
+                 <div className="space-y-3">
+                    <Button 
+                       onClick={startPractice}
+                       className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold h-12 text-base"
+                    >
+                       Open The Vault
+                    </Button>
+                    <Button 
+                       variant="ghost" 
+                       onClick={() => setView("ALREADY_PLAYED")} // Go back to dashboard basically
+                       className="w-full text-zinc-500 hover:text-white"
+                    >
+                       Return to Dashboard
+                    </Button>
+                 </div>
+              </div>
+           </motion.div>
+        )}
+
         {/* --- VIEW: QUIZ --- */}
         {view === "QUIZ" && questions[currentIndex] && (
           <motion.div
@@ -475,14 +591,18 @@ export default function DailyChallenge() {
             transition={{ duration: 0.3 }}
           >
             <div className="flex items-center justify-between mb-4 sm:mb-6 text-xs sm:text-sm font-mono text-zinc-500">
-              <span>QUESTION {currentIndex + 1} / {questions.length}</span>
-              <div className="text-blue-400 font-bold">SCORE: {Math.floor(score / 1000)}</div>
+              <span className={isPracticeMode ? "text-amber-500/80" : ""}>
+                 {isPracticeMode ? "PRACTICE" : "QUESTION"} {currentIndex + 1} / {questions.length}
+              </span>
+              <div className={`${isPracticeMode ? "text-zinc-600" : "text-blue-400 font-bold"}`}>
+                 SCORE: {Math.floor(score / 1000)}
+              </div>
             </div>
 
             {/* Progress Bar */}
             <div className="w-full h-1 sm:h-1.5 bg-zinc-800 rounded-full mb-6 sm:mb-8 overflow-hidden">
               <motion.div 
-                className="h-full bg-blue-500"
+                className={`h-full ${isPracticeMode ? "bg-amber-500" : "bg-blue-500"}`}
                 initial={{ width: `${((currentIndex) / questions.length) * 100}%` }}
                 animate={{ width: `${((currentIndex + 1) / questions.length) * 100}%` }}
               />
@@ -590,6 +710,16 @@ export default function DailyChallenge() {
                         View Leaderboard
                       </Button>
                     </Link>
+                    
+                    {/* Vault Entry Point */}
+                    <Button 
+                       variant="outline" 
+                       className="w-full border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 text-xs h-9"
+                       onClick={() => setView("PRACTICE_CONFIG")}
+                    >
+                       <Archive className="w-3 h-3 mr-2" />
+                       Enter The Vault (Practice)
+                    </Button>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3 w-full">
@@ -601,11 +731,72 @@ export default function DailyChallenge() {
                         View Global Rankings
                       </Button>
                     </Link>
+                    
                     <Button variant="ghost" className="text-zinc-500 text-xs" disabled>
                         Next Quiz in: {24 - new Date().getHours()}h {60 - new Date().getMinutes()}m
                     </Button>
+
+                    {/* Vault Entry Point */}
+                    <Button 
+                       variant="outline" 
+                       className="w-full border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900 text-xs h-9"
+                       onClick={() => setView("PRACTICE_CONFIG")}
+                    >
+                       <Archive className="w-3 h-3 mr-2" />
+                       Enter The Vault (Practice)
+                    </Button>
                   </div>
                 )}
+            </div>
+          </motion.div>
+        )}
+
+        {/* --- VIEW: PRACTICE COMPLETED --- */}
+        {view === "PRACTICE_COMPLETED" && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center pt-12"
+          >
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/20 mb-6 text-amber-500">
+                <Book className="w-8 h-8" />
+            </div>
+
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
+                Session Complete
+            </h2>
+            <p className="text-sm sm:text-base text-zinc-400 mb-6 sm:mb-8 max-w-xs sm:max-w-sm mx-auto leading-relaxed">
+                Practice makes perfect. These scores are just for you and don&apos;t affect your leaderboard ranking.
+            </p>
+
+            <div className="p-4 sm:p-6 md:p-8 bg-zinc-900/50 border border-white/5 rounded-2xl mb-6 sm:mb-8 relative z-10 backdrop-blur-sm">
+                <div className="text-center">
+                   <div className="text-xs sm:text-sm text-zinc-500 uppercase tracking-widest mb-1">Practice Score</div>
+                   <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-amber-500 tracking-tighter">
+                       {Math.floor(score / 1000)}
+                   </div>
+                </div>
+            </div>
+
+            <div className="flex flex-col gap-3 max-w-xs sm:max-w-sm md:max-w-md mx-auto w-full">
+               <Button 
+                  onClick={() => setView("PRACTICE_CONFIG")}
+                  className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold"
+               >
+                  <RotateCcw className="w-4 h-4 mr-2" />
+                  Practice Again
+               </Button>
+               
+               <Button 
+                  variant="ghost"
+                  onClick={() => {
+                     // Re-init daily view logic to see if we played today
+                     window.location.reload(); // lazy way to reset state back to main logic
+                  }}
+                  className="w-full text-zinc-500 hover:text-white"
+               >
+                  Return to Dashboard
+               </Button>
             </div>
           </motion.div>
         )}
