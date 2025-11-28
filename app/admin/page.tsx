@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { 
   Plus, Calendar, Save, CheckCircle2, Loader2, Trash2, 
-  ArrowLeft, Edit, Search
+  ArrowLeft, Edit, Search, Folder, ChevronRight
 } from "lucide-react";
 
 // --- Types ---
@@ -19,6 +19,27 @@ interface Question {
   correct_id: string;
   date: string; // YYYY-MM-DD
 }
+
+interface DateFolder {
+  date: string;
+  count: number;
+  questions: Question[];
+  color: string;
+}
+
+const FOLDER_COLORS = [
+  "text-blue-500", "text-green-500", "text-purple-500", "text-orange-500", 
+  "text-pink-500", "text-teal-500", "text-indigo-500", "text-cyan-500", 
+  "text-rose-500", "text-emerald-500", "text-amber-500", "text-violet-500"
+];
+
+const getRandomColor = (seed: string) => {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return FOLDER_COLORS[Math.abs(hash) % FOLDER_COLORS.length];
+};
 
 const INITIAL_QUESTION: Question = {
   question: "",
@@ -48,9 +69,11 @@ const formatDate = (dateStr: string) => {
 };
 
 export default function AdminPanel() {
-  const [view, setView] = useState<"LIST" | "EDIT">("LIST");
+  const [view, setView] = useState<"FOLDERS" | "LIST" | "EDIT">("FOLDERS");
   const [loading, setLoading] = useState(false);
   const [listData, setListData] = useState<Question[]>([]);
+  const [folders, setFolders] = useState<DateFolder[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Form State
@@ -58,10 +81,23 @@ export default function AdminPanel() {
   
   // Refs for date inputs
   const dateInputRefs = useRef<{ [key: number]: HTMLInputElement | null }>({});
+  
+  // Ref for scroll position
+  const scrollPositionRef = useRef(0);
 
+  // Effect to restore scroll position when switching back
   useEffect(() => {
-    if (view === "LIST") fetchQuestions();
+    if (view === "LIST" || view === "FOLDERS") {
+      setTimeout(() => {
+        window.scrollTo(0, scrollPositionRef.current);
+      }, 0);
+    }
   }, [view]);
+
+  // Effect to fetch questions only on mount or manual refresh
+  useEffect(() => {
+    fetchQuestions();
+  }, []); 
 
   async function fetchQuestions() {
     setLoading(true);
@@ -75,14 +111,46 @@ export default function AdminPanel() {
       console.error("Error fetching full object:", error);
       alert("Error fetching data: " + (error.message || JSON.stringify(error)));
     } else {
-      setListData(data || []);
+      const questions = data || [];
+      setListData(questions);
+      
+      // Group by date
+      const grouped = questions.reduce((acc: { [key: string]: Question[] }, q: Question) => {
+        if (!acc[q.date]) acc[q.date] = [];
+        acc[q.date].push(q);
+        return acc;
+      }, {});
+      
+      const folderList = Object.keys(grouped).map(date => ({
+        date,
+        count: grouped[date].length,
+        questions: grouped[date],
+        color: getRandomColor(date)
+      })).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      setFolders(folderList);
     }
       setLoading(false);
   }
 
   // --- Actions ---
+  
+  const handleOpenFolder = (date: string) => {
+    scrollPositionRef.current = window.scrollY;
+    setSelectedDate(date);
+    setView("LIST");
+    window.scrollTo(0, 0);
+  };
+
+  const handleBackToFolders = () => {
+    setSelectedDate(null);
+    setView("FOLDERS");
+  };
 
   const handleEdit = (item: any) => {
+    // Save current scroll position before switching views
+    scrollPositionRef.current = window.scrollY;
+    
     setFormData({
       id: item.id,
       question: item.question,
@@ -94,7 +162,13 @@ export default function AdminPanel() {
   };
 
   const handleCreate = () => {
-    setFormData(INITIAL_QUESTION);
+    // Save scroll position here too, just in case
+    scrollPositionRef.current = window.scrollY;
+    
+    setFormData({
+      ...INITIAL_QUESTION,
+      date: selectedDate || new Date().toISOString().split("T")[0]
+    });
     setView("EDIT");
   };
 
@@ -107,6 +181,7 @@ export default function AdminPanel() {
     } else {
       if (view === "EDIT") {
         setView("LIST");
+        fetchQuestions(); 
       } else {
         fetchQuestions();
       }
@@ -144,7 +219,12 @@ export default function AdminPanel() {
     if (error) {
       alert("Error saving: " + error.message);
     } else {
+      // If date changed, we might need to switch folders or just refresh
+      if (selectedDate && formData.date !== selectedDate) {
+         alert("Saved! Question moved to " + formData.date);
+      }
       setView("LIST");
+      fetchQuestions(); 
     }
   };
 
@@ -169,10 +249,19 @@ export default function AdminPanel() {
     setFormData({ ...formData, options_json: newOptions });
   };
 
-  // Filtered List
-  const filteredList = listData.filter(q => 
-    q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    q.date.includes(searchTerm)
+  // Filtered List (Only show questions for selected date)
+  const filteredList = listData.filter(q => {
+    if (selectedDate && q.date !== selectedDate) return false;
+    return (
+      q.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      q.date.includes(searchTerm)
+    );
+  });
+
+  // Filter folders based on search
+  const filteredFolders = folders.filter(f => 
+    f.date.includes(searchTerm) || 
+    f.questions.some(q => q.question.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -181,9 +270,30 @@ export default function AdminPanel() {
       {/* Header */}
       <header className="border-b border-white/10 bg-zinc-950/50 backdrop-blur sticky top-0 z-40">
         <div className="px-6 h-16 flex items-center justify-between w-full">
-          <div>
-            <h1 className="font-bold text-lg tracking-tight">Manage Quizzes</h1>
-            <p className="text-xs text-zinc-500">Create and edit daily questions</p>
+          <div className="flex items-center gap-2">
+             {view === "LIST" && selectedDate ? (
+                 <Button 
+                    variant="ghost" 
+                    className="text-zinc-400 hover:text-white pl-0 pr-2" 
+                    onClick={handleBackToFolders}
+                 >
+                    <ArrowLeft className="w-5 h-5" />
+                 </Button>
+             ) : null}
+             
+             <div>
+               <h1 className="font-bold text-lg tracking-tight flex items-center gap-2">
+                 {view === "LIST" && selectedDate ? (
+                    <>
+                       <span>{formatDate(selectedDate).month} {formatDate(selectedDate).day}</span>
+                       <span className="text-zinc-600 text-sm font-normal">({filteredList.length})</span>
+                    </>
+                 ) : "Manage Quizzes"}
+               </h1>
+               <p className="text-xs text-zinc-500">
+                 {view === "LIST" && selectedDate ? "Editing questions for this day" : "Create and edit daily questions"}
+               </p>
+             </div>
           </div>
 
           {view === "LIST" && (
@@ -195,6 +305,69 @@ export default function AdminPanel() {
       </header>
 
       <main className="px-6 py-8">
+
+        {/* --- FOLDERS VIEW --- */}
+        {view === "FOLDERS" && (
+           <div className="space-y-6">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 w-4 h-4" />
+                <Input 
+                  placeholder="Search dates or questions..." 
+                  className="bg-zinc-900 border-white/10 pl-10 py-6 text-white placeholder:text-zinc-600 rounded-xl focus-visible:ring-zinc-700"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+
+              {loading && folders.length === 0 ? (
+                <div className="flex justify-center py-20"><Loader2 className="animate-spin text-zinc-500" /></div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                   {filteredFolders.map((folder) => (
+                      <div 
+                        key={folder.date}
+                        onClick={() => handleOpenFolder(folder.date)}
+                        className="group bg-zinc-900/50 border border-white/5 hover:border-white/10 p-5 rounded-xl cursor-pointer transition-all hover:bg-zinc-900 hover:scale-[1.02] active:scale-[0.98]"
+                      >
+                         <div className="flex items-start justify-between mb-4">
+                            <div className={`p-2.5 bg-zinc-800 rounded-lg ${folder.color} group-hover:bg-zinc-800/80 transition-colors`}>
+                               <Folder className="w-6 h-6" fill="currentColor" fillOpacity={0.2} />
+                            </div>
+                            {/* You could put a status badge here if you had one */}
+                         </div>
+                         
+                         <div>
+                            <h3 className="text-lg font-bold text-white mb-1">
+                                {new Date(folder.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                            </h3>
+                            <p className="text-sm text-zinc-500">
+                               {folder.count} question{folder.count !== 1 ? 's' : ''}
+                            </p>
+                         </div>
+                         
+                         <div className="mt-4 pt-4 border-t border-white/5 flex items-center justify-between text-xs text-zinc-500 group-hover:text-zinc-400">
+                            <span>View Questions</span>
+                            <ChevronRight className="w-4 h-4" />
+                         </div>
+                      </div>
+                   ))}
+                   
+                   {/* New Day Card */}
+                   <div 
+                      onClick={() => {
+                         const today = new Date().toISOString().split("T")[0];
+                         handleOpenFolder(today); 
+                      }}
+                      className="flex flex-col items-center justify-center gap-3 p-5 border border-dashed border-white/10 rounded-xl cursor-pointer hover:bg-zinc-900/30 text-zinc-500 hover:text-zinc-300 transition-colors min-h-[160px]"
+                   >
+                      <Plus className="w-8 h-8" />
+                      <span className="font-medium">Start New Day</span>
+                   </div>
+                </div>
+              )}
+           </div>
+        )}
 
         {/* --- LIST VIEW --- */}
         {view === "LIST" && (
