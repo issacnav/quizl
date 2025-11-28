@@ -105,7 +105,11 @@ export default function AdminPanel() {
     if (error) {
       alert("Error deleting: " + error.message);
     } else {
-      fetchQuestions();
+      if (view === "EDIT") {
+        setView("LIST");
+      } else {
+        fetchQuestions();
+      }
     }
   };
 
@@ -363,18 +367,33 @@ export default function AdminPanel() {
                 </Card>
 
             {/* Save Bar */}
-            <div className="flex justify-end mt-6 gap-4">
-               <Button variant="ghost" onClick={() => setView("LIST")} className="text-zinc-400 hover:text-white">
-                  Cancel
-                </Button>
-               <Button 
-                  onClick={handleSave} 
-                  disabled={loading}
-                  className="bg-white text-black hover:bg-zinc-200 rounded-full px-8"
-               >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
-                  Save Changes
-                </Button>
+            <div className="flex items-center justify-between mt-6">
+              <div>
+                {formData.id && (
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => handleDelete(formData.id!)} 
+                    className="text-red-400 hover:text-red-300 hover:bg-red-950/30"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete Question
+                  </Button>
+                )}
+              </div>
+
+              <div className="flex gap-4">
+                <Button variant="ghost" onClick={() => setView("LIST")} className="text-zinc-400 hover:text-white">
+                    Cancel
+                  </Button>
+                <Button 
+                    onClick={handleSave} 
+                    disabled={loading}
+                    className="bg-white text-black hover:bg-zinc-200 rounded-full px-8"
+                >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Save className="w-4 h-4 mr-2" />}
+                    Save Changes
+                  </Button>
+              </div>
             </div>
 
           </div>
