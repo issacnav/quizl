@@ -16,7 +16,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 // --- Types ---
-type ViewState = "LOADING" | "QUIZ" | "COMPLETED" | "ALREADY_PLAYED" | "PRACTICE_CONFIG" | "PRACTICE_COMPLETED";
+type ViewState = "LOADING" | "QUIZ" | "COMPLETED" | "ALREADY_PLAYED" | "PRACTICE_CONFIG" | "PRACTICE_COMPLETED" | "NO_QUIZ_TODAY";
 
 // The "Linear" Blur-In Effect
 const blurIn = {
@@ -202,7 +202,7 @@ export default function DailyChallenge() {
 
       if (error || !data || data.length === 0) {
         console.error("No quiz found");
-        // Optional: Fallback logic if needed, or just stay in loading
+        setView("NO_QUIZ_TODAY");
       } else {
         setQuestions(data);
         
@@ -676,26 +676,31 @@ export default function DailyChallenge() {
           </motion.div>
         )}
 
-        {/* --- VIEW: ALREADY PLAYED --- */}
-        {(view === "ALREADY_PLAYED" || view === "COMPLETED") && (
+        {/* --- VIEW: ALREADY PLAYED / COMPLETED / NO QUIZ --- */}
+        {(view === "ALREADY_PLAYED" || view === "COMPLETED" || view === "NO_QUIZ_TODAY") && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="text-center pt-12"
           >
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-zinc-900 border border-zinc-800 mb-6">
-                {view === "COMPLETED" ? <Trophy className="w-8 h-8 text-yellow-500" /> : <Clock className="w-8 h-8 text-blue-500" />}
+                {view === "COMPLETED" ? <Trophy className="w-8 h-8 text-yellow-500" /> : 
+                 view === "NO_QUIZ_TODAY" ? <Archive className="w-8 h-8 text-zinc-500" /> :
+                 <Clock className="w-8 h-8 text-blue-500" />}
             </div>
 
             <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
-                {view === "COMPLETED" ? "Session Complete" : "You've played today"}
+                {view === "COMPLETED" ? "Session Complete" : 
+                 view === "NO_QUIZ_TODAY" ? "No Daily Challenge" :
+                 "You've played today"}
             </h2>
             <p className="text-sm sm:text-base text-zinc-400 mb-6 sm:mb-8 max-w-xs sm:max-w-sm mx-auto leading-relaxed">
-                {view === "COMPLETED" 
-                    ? getFeedbackMessage(score)
-                    : "Daily Quiz reset at midnight. Come back tomorrow for a new set of questions."}
+                {view === "COMPLETED" ? getFeedbackMessage(score) :
+                 view === "NO_QUIZ_TODAY" ? "There is no scheduled quiz for today. Check back tomorrow or use Practice Mode." :
+                 "Daily Quiz reset at midnight. Come back tomorrow for a new set of questions."}
             </p>
 
+            {view !== "NO_QUIZ_TODAY" && (
             <div 
               className="w-40 h-40 mx-auto mb-[-12px] cursor-pointer hover:scale-105 transition-transform relative z-20"
               onClick={() => lottieRef.current?.goToAndPlay(0)}
@@ -706,7 +711,9 @@ export default function DailyChallenge() {
                  loop={false} 
                />
             </div>
+            )}
 
+            {view !== "NO_QUIZ_TODAY" && (
             <div className="grid grid-cols-2 gap-px bg-white/10 rounded-2xl overflow-hidden border border-white/5 mb-8 max-w-xs sm:max-w-sm md:max-w-md mx-auto w-full">
                 <div className="bg-zinc-900/50 p-4 flex flex-col items-center">
                   <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Today</span>
@@ -718,6 +725,7 @@ export default function DailyChallenge() {
                   <span className="text-3xl font-mono font-bold text-yellow-500 mt-1">{Math.floor(totalScore / 1000)}</span>
                 </div>
             </div>
+            )}
 
             <div className="flex flex-col gap-3 mb-8 max-w-xs sm:max-w-sm md:max-w-md mx-auto w-full">
                 
