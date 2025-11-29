@@ -29,3 +29,4 @@ CREATE POLICY "Allow authenticated update on own leaderboard entry" ON leaderboa
 
 
 
+

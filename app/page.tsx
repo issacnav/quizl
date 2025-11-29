@@ -493,13 +493,13 @@ export default function DailyChallenge() {
           <motion.div 
             initial="hidden"
             animate="visible"
-            exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+            exit={{ opacity: 0, height: 0, marginBottom: 0, filter: "blur(10px)" }}
             variants={blurIn}
-            className="absolute top-16 left-0 right-0 flex flex-col items-center z-50"
+            className="w-full flex flex-col items-center z-50 mb-6 sm:mb-10 mt-4 sm:mt-8"
           >
             <div className="flex items-center gap-3 mb-2">
               {/* Text with Linear Gradient */}
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-white/40 text-center">
                 {isPracticeMode ? "The Vault" : "PhysioQuiz"}
               </h1>
             </div>
@@ -624,6 +624,7 @@ export default function DailyChallenge() {
             animate="visible"
             exit="exit"
             transition={{ duration: 0.3 }}
+            className="w-full max-w-2xl mx-auto"
           >
             <div className="flex items-center justify-between mb-4 sm:mb-6 text-xs sm:text-sm font-mono text-zinc-500">
               <span className={isPracticeMode ? "text-amber-500/80" : ""}>

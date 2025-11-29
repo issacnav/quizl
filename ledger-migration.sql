@@ -227,3 +227,4 @@ GRANT EXECUTE ON FUNCTION get_user_total_score(UUID) TO authenticated;
 
 
 
+
