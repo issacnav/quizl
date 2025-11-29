@@ -95,7 +95,7 @@ export default function AdminLayout({
             </div>
             <CardTitle className="text-2xl text-white">Admin Access</CardTitle>
             <CardDescription className="text-zinc-500">
-              You must be logged in as <strong>{ADMIN_EMAIL}</strong> to continue.
+              You must be logged in as an administrator to continue.
             </CardDescription>
           </CardHeader>
           
@@ -104,12 +104,10 @@ export default function AdminLayout({
                 onClick={handleLogin} 
                 className="w-full bg-white text-black hover:bg-zinc-200 h-12 font-medium"
               >
-                <Image 
+                <img 
                   src="https://www.google.com/favicon.ico" 
-                  alt="Google" 
-                  width={20} 
-                  height={20} 
-                  className="mr-2 opacity-80"
+                  alt="" 
+                  className="w-5 h-5 mr-2 opacity-80"
                 />
                 Sign in with Google
               </Button>
