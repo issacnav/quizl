@@ -44,6 +44,7 @@ export default function DailyChallenge() {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
   const [isPracticeMode, setIsPracticeMode] = useState(false);
   const [practiceCount, setPracticeCount] = useState(5);
+  const [totalQuestionsCount, setTotalQuestionsCount] = useState(50); // Default until fetched
   
   // Quiz Logic
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -150,6 +151,20 @@ export default function DailyChallenge() {
     };
     
     initUser();
+  }, []);
+
+  // Fetch total question count for Practice Mode
+  useEffect(() => {
+    const fetchTotalCount = async () => {
+      const { count } = await supabase
+        .from('daily_quiz')
+        .select('*', { count: 'exact', head: true });
+      
+      if (count !== null) {
+        setTotalQuestionsCount(count);
+      }
+    };
+    fetchTotalCount();
   }, []);
 
   useEffect(() => {
@@ -445,25 +460,10 @@ export default function DailyChallenge() {
     setQuestions([]); // Clear previous
     setIsPracticeMode(true);
     
-    // Fetch past questions from Supabase
-    // Logic: Date < TODAY, limit by practiceCount
-    // Since we want random, we can't easily do random() in Supabase without a function
-    // So we'll fetch a larger batch of past IDs and pick randomly, or just fetch recent past.
-    // For now: Fetch past 100, shuffle client side, take N.
-    
-    const today = getTodayString();
-    // Fetch questions where date <= today (including today if you want, but usually practice is past)
-    // But user said "more than 80 questions" - if they are all in the future (e.g. Dec 2025),
-    // lt('date', today) might return 0 results if today is Nov 2025.
-    // Let's remove the date filter for now to allow testing with ALL seeded questions, 
-    // or change logic to just pick random non-daily questions if that was the intent.
-    // Assuming we want "The Vault" to be ALL questions available in DB for practice.
-    
+    // Fetch ALL questions from the database
     const { data, error } = await supabase
       .from('daily_quiz')
-      .select('*')
-      // .lt('date', today)  <-- Removed to allow access to all 80+ questions for practice
-      .limit(100); 
+      .select('*');
 
     if (error || !data || data.length === 0) {
        alert("No questions available in The Vault yet!");
@@ -472,7 +472,9 @@ export default function DailyChallenge() {
 
     // Shuffle and slice
     const shuffled = [...data].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, practiceCount);
+    // Ensure we don't request more than available
+    const countToTake = Math.min(practiceCount, shuffled.length);
+    const selected = shuffled.slice(0, countToTake);
     
     setQuestions(selected);
     setCurrentIndex(0);
@@ -552,19 +554,19 @@ export default function DailyChallenge() {
                     <div className="px-2">
                         <Slider 
                            defaultValue={[5]} 
-                           max={50} 
-                           min={5} 
-                           step={5} 
+                           max={totalQuestionsCount} 
+                           min={1} 
+                           step={1} 
                            onValueChange={(vals) => setPracticeCount(vals[0])}
                            className="py-4 cursor-pointer"
                         />
                     </div>
                     
-                    <div className="grid grid-cols-4 gap-2 text-center">
+                    <div className="grid grid-cols-5 gap-2 text-center">
                         {[5, 10, 20, 50].map((val) => (
                             <button 
                                 key={val}
-                                onClick={() => setPracticeCount(val)}
+                                onClick={() => setPracticeCount(Math.min(val, totalQuestionsCount))}
                                 className={`text-xs py-2 rounded-lg border transition-all ${
                                     practiceCount === val 
                                     ? "bg-amber-500/20 border-amber-500/50 text-amber-300" 
@@ -574,6 +576,16 @@ export default function DailyChallenge() {
                                 {val} Qs
                             </button>
                         ))}
+                         <button 
+                            onClick={() => setPracticeCount(totalQuestionsCount)}
+                            className={`text-xs py-2 rounded-lg border transition-all ${
+                                practiceCount === totalQuestionsCount
+                                ? "bg-amber-500/20 border-amber-500/50 text-amber-300" 
+                                : "bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-700"
+                            }`}
+                        >
+                            All
+                        </button>
                     </div>
 
                     <p className="text-xs text-zinc-500 text-center italic">
