@@ -6,12 +6,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { List, BarChart3, ArrowLeft, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { supabase } from "@/utils/supabase";
 
 // --- CONFIG ---
-const ADMIN_USER = "sarthaknav";
-const ADMIN_PASS = "Delightful@98";
+// Replace this with your actual email
+const ADMIN_EMAIL = "navalekarsarthak77@gmail.com";
 
 interface NavItem {
   label: string;
@@ -41,29 +41,28 @@ export default function AdminLayout({
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Login Form State
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-
   useEffect(() => {
-    // Check session storage on mount
-    const auth = sessionStorage.getItem("admin_auth");
-    if (auth === "true") {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    setIsLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user && user.email === ADMIN_EMAIL) {
       setIsAuthorized(true);
     }
     setIsLoading(false);
-  }, []);
+  };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (username === ADMIN_USER && password === ADMIN_PASS) {
-      sessionStorage.setItem("admin_auth", "true");
-      setIsAuthorized(true);
-      setError("");
-    } else {
-      setError("Invalid credentials");
-    }
+  const handleLogin = async () => {
+    // Trigger Google Login
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.href,
+      },
+    });
   };
 
   const isActive = (href: string) => {
@@ -96,44 +95,31 @@ export default function AdminLayout({
             </div>
             <CardTitle className="text-2xl text-white">Admin Access</CardTitle>
             <CardDescription className="text-zinc-500">
-              Enter your credentials to continue
+              You must be logged in as <strong>{ADMIN_EMAIL}</strong> to continue.
             </CardDescription>
           </CardHeader>
-          <form onSubmit={handleLogin}>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Username</label>
-                <Input 
-                  type="text" 
-                  placeholder="Username" 
-                  className="bg-black border-white/10 text-white"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+          
+          <CardContent className="space-y-4">
+             <Button 
+                onClick={handleLogin} 
+                className="w-full bg-white text-black hover:bg-zinc-200 h-12 font-medium"
+              >
+                <Image 
+                  src="https://www.google.com/favicon.ico" 
+                  alt="Google" 
+                  width={20} 
+                  height={20} 
+                  className="mr-2 opacity-80"
                 />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Password</label>
-                <Input 
-                  type="password" 
-                  placeholder="••••••••" 
-                  className="bg-black border-white/10 text-white"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              {error && (
-                <p className="text-xs text-red-400 text-center">{error}</p>
-              )}
-            </CardContent>
-            <CardFooter className="flex flex-col gap-4">
-              <Button type="submit" className="w-full bg-white text-black hover:bg-zinc-200">
-                Unlock Panel
+                Sign in with Google
               </Button>
-              <Link href="/" className="text-xs text-zinc-500 hover:text-white transition-colors">
-                Return to website
-              </Link>
-            </CardFooter>
-          </form>
+          </CardContent>
+          
+          <CardFooter className="flex justify-center">
+            <Link href="/" className="text-xs text-zinc-500 hover:text-white transition-colors">
+              Return to website
+            </Link>
+          </CardFooter>
         </Card>
       </div>
     );
