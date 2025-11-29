@@ -1,0 +1,1586 @@
+[
+  {
+    "id": "dcbbe75c-55fe-4a67-a952-f344065dec88",
+    "question": "A coach tells an athlete how quickly they completed the drill. This is an example of which of the following?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Knowledge of performance"
+      },
+      {
+        "id": "b",
+        "text": "Augmented feedback"
+      },
+      {
+        "id": "c",
+        "text": "Knowledge of results"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:36.351128+00:00",
+    "updated_at": "2025-11-28T21:27:36.351128+00:00",
+    "date": "2025-11-30"
+  },
+  {
+    "id": "1fcfee75-5ee5-4e62-9d62-7b6acb67c317",
+    "question": "Which joint action occurs during the contract phase of the contract-relax hamstring stretch?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Hip extension"
+      },
+      {
+        "id": "b",
+        "text": "Knee extension"
+      },
+      {
+        "id": "c",
+        "text": "Knee flexion"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:36.477324+00:00",
+    "updated_at": "2025-11-28T21:27:36.477324+00:00",
+    "date": "2025-11-30"
+  },
+  {
+    "id": "529e2f88-fc02-4781-8a0b-ad1c45e11884",
+    "question": "The following statement is a good example of what aspect of a program?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Mission statement"
+      },
+      {
+        "id": "b",
+        "text": "Program goal"
+      },
+      {
+        "id": "c",
+        "text": "Program objective"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:36.612128+00:00",
+    "updated_at": "2025-11-28T21:27:36.612128+00:00",
+    "date": "2025-11-30"
+  },
+  {
+    "id": "5c904b2b-806c-4bb5-a5f8-a3ad22aefbc9",
+    "question": "Which type of speed development training is overspeed training?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Resistance training"
+      },
+      {
+        "id": "b",
+        "text": "Assistance training"
+      },
+      {
+        "id": "c",
+        "text": "Power training"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:36.742313+00:00",
+    "updated_at": "2025-11-28T21:27:36.742313+00:00",
+    "date": "2025-11-30"
+  },
+  {
+    "id": "c0d35166-1848-4cd4-950e-33067180fe91",
+    "question": "What blood pressure response typically occurs when an athlete rapidly loses weight?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Blood pressure initially decreases, then increases"
+      },
+      {
+        "id": "b",
+        "text": "Blood pressure decreases"
+      },
+      {
+        "id": "c",
+        "text": "Blood pressure increases"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:36.87217+00:00",
+    "updated_at": "2025-11-28T21:27:36.87217+00:00",
+    "date": "2025-11-30"
+  },
+  {
+    "id": "492db51c-62df-41a8-bdb0-86c35cac3164",
+    "question": "Which phase of tissue healing results in tissue strength increasing?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Maturation-remodeling phase"
+      },
+      {
+        "id": "b",
+        "text": "Inflammatory response phase"
+      },
+      {
+        "id": "c",
+        "text": "Fibroblastic repair phase"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:36.997911+00:00",
+    "updated_at": "2025-11-28T21:27:36.997911+00:00",
+    "date": "2025-11-30"
+  },
+  {
+    "id": "db2c3b9f-4440-4718-aa4c-c72aa42750df",
+    "question": "An athlete is training at altitude. Which of the following are they  at risk for?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Fatigue"
+      },
+      {
+        "id": "b",
+        "text": "Dehydration"
+      },
+      {
+        "id": "c",
+        "text": "Low oxygen levels"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:37.129955+00:00",
+    "updated_at": "2025-11-28T21:27:37.129955+00:00",
+    "date": "2025-11-30"
+  },
+  {
+    "id": "5ad9c031-9ae8-41ad-956c-de487773ab73",
+    "question": "During maximal velocity (top-speed) sprinting, what is the action that occurs in the ankle in the early support phase to absorb force?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Concentric dorsiflexion"
+      },
+      {
+        "id": "b",
+        "text": "Eccentric plantarflexion"
+      },
+      {
+        "id": "c",
+        "text": "Eccentric dorsiflexion"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:37.260588+00:00",
+    "updated_at": "2025-11-28T21:27:37.260588+00:00",
+    "date": "2025-11-30"
+  },
+  {
+    "id": "ebf89587-3c68-4b09-8a80-85a29c4ad726",
+    "question": "What resistance training status level would be considered for an athlete who has been training 2 to 3 days a week for three months?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Advanced"
+      },
+      {
+        "id": "b",
+        "text": "Intermediate"
+      },
+      {
+        "id": "c",
+        "text": "Beginner"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:37.387522+00:00",
+    "updated_at": "2025-11-28T21:27:37.387522+00:00",
+    "date": "2025-11-30"
+  },
+  {
+    "id": "d9972fd8-8bcd-44fb-bebb-ea1526581a23",
+    "question": "The percentile ranks of an athlete's vertical jump and 1RM back squat vary greatly. Which of the following types of validity would these results reinforce?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Face validity"
+      },
+      {
+        "id": "b",
+        "text": "Discriminant validity"
+      },
+      {
+        "id": "c",
+        "text": "Convergent validity"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:37.656306+00:00",
+    "updated_at": "2025-11-28T21:27:37.656306+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "7b775fce-bc6d-46b3-88bb-b2b254648371",
+    "question": "Which of the following amino acids is the rate-limiting substrate for carnosine in muscle cells?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Arginine"
+      },
+      {
+        "id": "b",
+        "text": "Serine"
+      },
+      {
+        "id": "c",
+        "text": "Glycine"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:37.791094+00:00",
+    "updated_at": "2025-11-28T21:27:37.791094+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "942a3c05-fbe4-4d28-89b5-d43a45e27768",
+    "question": "Which of the following is a biaxial joint?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Hip"
+      },
+      {
+        "id": "b",
+        "text": "Ankle"
+      },
+      {
+        "id": "c",
+        "text": "Shoulder"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:37.924501+00:00",
+    "updated_at": "2025-11-28T21:27:37.924501+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "fbc2940e-668f-4672-b8bc-0720070a8b97",
+    "question": "How long should an athlete rest between sets when their goal is to improve single-effort power?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "1.5-3 minutes"
+      },
+      {
+        "id": "b",
+        "text": "2-5 minutes"
+      },
+      {
+        "id": "c",
+        "text": "4-6 minutes"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:38.056901+00:00",
+    "updated_at": "2025-11-28T21:27:38.056901+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "713c9c7a-89e7-4525-aaf4-29ffce1f36a2",
+    "question": "A strength and conditioning coach evaluates an athlete's upper body pushing strength using a novel strength test. Over the course of 5 attempts, and on a 100 point scale, the athlete scored 85, 86, 84, 85, 84. Which of the following best describes this test?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "High intrarater variability"
+      },
+      {
+        "id": "b",
+        "text": "High typical error of measurement"
+      },
+      {
+        "id": "c",
+        "text": "High reliability"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:38.190216+00:00",
+    "updated_at": "2025-11-28T21:27:38.190216+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "b9ad7840-c928-42cf-9c3f-1d7eec4d0e32",
+    "question": "All the following are possible exercise options during the , except:",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Maximal isometric exercise"
+      },
+      {
+        "id": "b",
+        "text": "Velocity-specific muscle activity"
+      },
+      {
+        "id": "c",
+        "text": "Joint angle-specific strengthening"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:38.326775+00:00",
+    "updated_at": "2025-11-28T21:27:38.326775+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "5a7d9de2-2703-4635-9e9e-6e676d8958d9",
+    "question": "Which of the following describes the requirements for the 2-for-2 rule?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Adding weight to an exercise after a client has consistently completed more reps than assigned for said movement"
+      },
+      {
+        "id": "b",
+        "text": "Adding two pounds for every two extra reps a client completes on major lifts involving the upper body"
+      },
+      {
+        "id": "c",
+        "text": "Adding two pounds to a workout for every two extra reps a client completes on major lifts involving the lower body"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:38.459576+00:00",
+    "updated_at": "2025-11-28T21:27:38.459576+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "46e7c14d-4ff3-437f-865c-fed0963c3d53",
+    "question": "What does vitamin K most support?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Wound healing"
+      },
+      {
+        "id": "b",
+        "text": "Blood clotting"
+      },
+      {
+        "id": "c",
+        "text": "Immune function"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:38.600053+00:00",
+    "updated_at": "2025-11-28T21:27:38.600053+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "42d23f05-8999-4530-b70a-c955c8fac643",
+    "question": "A strength coach intends to test an athlete's sprinting ability by directly performing a 40-meter sprint test. The coach is also testing the athlete with a T-test for agility and a push-up test for local muscular endurance.",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "T-test > sprint test > push-up test"
+      },
+      {
+        "id": "b",
+        "text": "Push-up test > sprint test > t-test"
+      },
+      {
+        "id": "c",
+        "text": "Sprint test > t-test > push-up test"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:38.729089+00:00",
+    "updated_at": "2025-11-28T21:27:38.729089+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "70e6261e-8d89-4946-a127-1ffb56af87d2",
+    "question": "Which of the following is a recommended position during the upward movement phase of the leg extension exercise?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Maintain a grip on your thighs"
+      },
+      {
+        "id": "b",
+        "text": "Keep the thighs, lower legs, and feet parallel to each other"
+      },
+      {
+        "id": "c",
+        "text": "Raise the roller pad by fully extending the knees"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:38.856371+00:00",
+    "updated_at": "2025-11-28T21:27:38.856371+00:00",
+    "date": "2025-12-01"
+  },
+  {
+    "id": "45e0324e-3fbb-441c-b90e-446aec4fae0f",
+    "question": "Approximately how far back should the stretched leg be positioned from the wall when performing the wall stretch?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "4 feet"
+      },
+      {
+        "id": "b",
+        "text": "1 foot"
+      },
+      {
+        "id": "c",
+        "text": "2 feet"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:38.993994+00:00",
+    "updated_at": "2025-11-28T21:27:38.993994+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "58bd2ba8-5dd0-4983-b16b-526234a02186",
+    "question": "Which of the following is not a source of self-efficacy?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Imaginal experience"
+      },
+      {
+        "id": "b",
+        "text": "Verbal persuasion"
+      },
+      {
+        "id": "c",
+        "text": "Cognitive challenge"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:39.127688+00:00",
+    "updated_at": "2025-11-28T21:27:39.127688+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "8ea946d2-f85c-43bb-9504-82f795f001cc",
+    "question": "What would the elbow be considered?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "A moment arm"
+      },
+      {
+        "id": "b",
+        "text": "A lever"
+      },
+      {
+        "id": "c",
+        "text": "A fulcrum"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:39.255974+00:00",
+    "updated_at": "2025-11-28T21:27:39.255974+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "6bdf01b7-605b-4d20-b8d2-4fc14d2cb5af",
+    "question": "A powerlifter is looking for an assistance exercise to help improve their bench press. Which of the following exercises would be the  to add?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Triceps pushdown"
+      },
+      {
+        "id": "b",
+        "text": "Close-grip bench press"
+      },
+      {
+        "id": "c",
+        "text": "Dumbbell shoulder press"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:39.386014+00:00",
+    "updated_at": "2025-11-28T21:27:39.386014+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "912fd9a7-cb6c-4733-b46b-e4e9ce562f01",
+    "question": "Exercises that target muscle groups such as the abdominals, calves, biceps, and triceps are referred to as which of the following?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Multi-joint exercises"
+      },
+      {
+        "id": "b",
+        "text": "Assistance exercises"
+      },
+      {
+        "id": "c",
+        "text": "Recovery exercises"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:39.520558+00:00",
+    "updated_at": "2025-11-28T21:27:39.520558+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "a789c020-c8bb-4a27-8d31-37396dcd5eca",
+    "question": "In general, what is the difference in the recommended grip width on the low-bar versus high-bar back squat?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "The recommended grip is wider for a high-bar back squat"
+      },
+      {
+        "id": "b",
+        "text": "The recommended grip is wider for a low-bar back squat"
+      },
+      {
+        "id": "c",
+        "text": "The recommended grip for a high-bar back squat is a hook grip"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:39.653214+00:00",
+    "updated_at": "2025-11-28T21:27:39.653214+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "a98f6101-1cbd-4477-8c61-a62d6d0d0772",
+    "question": "In the equation for determining exercise band resistance (tension = x ),what does the  represent?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Kilograms"
+      },
+      {
+        "id": "b",
+        "text": "Deformation"
+      },
+      {
+        "id": "c",
+        "text": "Stiffness"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:39.789127+00:00",
+    "updated_at": "2025-11-28T21:27:39.789127+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "0203b587-f2ea-4fc3-bece-dbdb5c3ef60c",
+    "question": "Which scapular position should be avoided when setting up for the two-arm kettlebell swing?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Depression"
+      },
+      {
+        "id": "b",
+        "text": "Retraction"
+      },
+      {
+        "id": "c",
+        "text": "Upward rotation"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:39.915315+00:00",
+    "updated_at": "2025-11-28T21:27:39.915315+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "0fa1af44-c5ec-4904-9f9d-174f7ae60108",
+    "question": "During testing, an athlete was found to rely heavily on their left leg when performing squats and other lower body exercises. Assuming the client doesn't have an injury that is preventing them from using their right lower extremity, which of the following strategies would most likely help to reduce this bilateral asymmetry?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Incorporating more balance training to improve force distribution patterns"
+      },
+      {
+        "id": "b",
+        "text": "Avoiding high load bilateral squats"
+      },
+      {
+        "id": "c",
+        "text": "Incorporating more unilateral squats into his routine"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:40.044601+00:00",
+    "updated_at": "2025-11-28T21:27:40.044601+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "ea77d8aa-e954-4249-9f4f-c349aeb77516",
+    "question": "Which of the following is the  important factor in aerobic endurance performance?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Maximal heart rate"
+      },
+      {
+        "id": "b",
+        "text": "Lactate threshold"
+      },
+      {
+        "id": "c",
+        "text": "Maximal aerobic capacity"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:40.169496+00:00",
+    "updated_at": "2025-11-28T21:27:40.169496+00:00",
+    "date": "2025-12-02"
+  },
+  {
+    "id": "61db978a-eeda-49d7-945c-2ecfabfab013",
+    "question": "An athlete is performing the 45-degree sit-up exercise. Which of the following is a component of the starting position of the exercise?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "The athlete lies supine on the ground, holding a medicine ball"
+      },
+      {
+        "id": "b",
+        "text": "The athlete sits at a 45-degree angle, holding a medicine ball"
+      },
+      {
+        "id": "c",
+        "text": "The coach stands in front of the athlete, holding a medicine ball"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:40.295031+00:00",
+    "updated_at": "2025-11-28T21:27:40.295031+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "263898fd-0a97-43f3-af0b-e27bb1e7ea9b",
+    "question": "Which of the following can lead to an increased risk of injury to the anterior cruciate ligament?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Excessive knee flexion"
+      },
+      {
+        "id": "b",
+        "text": "Excessive knee varus"
+      },
+      {
+        "id": "c",
+        "text": "Excessive knee valgus"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:40.426051+00:00",
+    "updated_at": "2025-11-28T21:27:40.426051+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "0d25813d-3488-40c2-8882-2fbfb3fff50f",
+    "question": "Which workout duration is most beneficial for pace/tempo training?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "20-30 minutes"
+      },
+      {
+        "id": "b",
+        "text": "3-5 minutes"
+      },
+      {
+        "id": "c",
+        "text": "20-60 minutes"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:40.555339+00:00",
+    "updated_at": "2025-11-28T21:27:40.555339+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "a5402909-2401-4764-98a5-a5df0f285ce8",
+    "question": "Which of the following is a common measure of intensity for aerobic exercise?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "%GTO"
+      },
+      {
+        "id": "b",
+        "text": "%HRR"
+      },
+      {
+        "id": "c",
+        "text": "%LT"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:40.68526+00:00",
+    "updated_at": "2025-11-28T21:27:40.68526+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "f312c69e-1b05-4275-a6a6-4c24d1bbb93e",
+    "question": "Which of the following statements is  about stretches that are held in one position for a moderate amount of time?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "They should be held for at least 45 seconds"
+      },
+      {
+        "id": "b",
+        "text": "They are not appropriate for all exercise populations"
+      },
+      {
+        "id": "c",
+        "text": "They should be held at a position of mild discomfort"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:40.817123+00:00",
+    "updated_at": "2025-11-28T21:27:40.817123+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "6bd18cb9-765b-45ed-8780-fd2d2eb23e6e",
+    "question": "Your client is a tennis player, and he is performing a backhand tennis stroke. This is an example of which of the following movement patterns?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Frontal plane adduction"
+      },
+      {
+        "id": "b",
+        "text": "Transverse plane abduction"
+      },
+      {
+        "id": "c",
+        "text": "Transverse plane adduction"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:40.943778+00:00",
+    "updated_at": "2025-11-28T21:27:40.943778+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "f3577f1f-f115-4a12-a1d0-2b2fad366a22",
+    "question": "What are the main energy substrates being used by a 600-meter-distance swimmer who completes their swimming bout in 6 minutes and 30 seconds?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Muscle glycogen + liver glycogen"
+      },
+      {
+        "id": "b",
+        "text": "Muscle glycogen + CP"
+      },
+      {
+        "id": "c",
+        "text": "Liver glycogen + fatty acids"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:41.077247+00:00",
+    "updated_at": "2025-11-28T21:27:41.077247+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "e52b6b8d-5acd-4b6a-adb5-b2ff8bf95bcb",
+    "question": "You're developing a resistance training program for a new athlete. This athlete is preparing to enter a professional strongman competition.",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Dumbbell overhead press"
+      },
+      {
+        "id": "b",
+        "text": "Triceps press-down"
+      },
+      {
+        "id": "c",
+        "text": "Power clean"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:41.204105+00:00",
+    "updated_at": "2025-11-28T21:27:41.204105+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "37b4b3cc-f257-46ce-82ff-9340e54815b3",
+    "question": "Which of the following refers to assigning a workout or training regimen of greater intensity than a given client's body is primed to manage?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Overload"
+      },
+      {
+        "id": "b",
+        "text": "Super-compensation"
+      },
+      {
+        "id": "c",
+        "text": "Specificity"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:41.341168+00:00",
+    "updated_at": "2025-11-28T21:27:41.341168+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "d1a2c594-fa87-4ee4-b272-5a65a38ce2e0",
+    "question": "Which of the following will have the  impact on muscular force?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Glycogen"
+      },
+      {
+        "id": "b",
+        "text": "Fatty acids"
+      },
+      {
+        "id": "c",
+        "text": "Amino acids"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:41.469827+00:00",
+    "updated_at": "2025-11-28T21:27:41.469827+00:00",
+    "date": "2025-12-03"
+  },
+  {
+    "id": "a34bd448-cf76-4f61-acbe-b423946285ee",
+    "question": "John is preparing his lunch for the work day. Which of the following snacks would be  if he wants to increase the amount of omega-3 fatty acids and minimize the amount of omega-6 fatty acids?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "A small bag of sunflower seeds"
+      },
+      {
+        "id": "b",
+        "text": "A handful of almonds"
+      },
+      {
+        "id": "c",
+        "text": "A piece of avocado toast"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:41.601219+00:00",
+    "updated_at": "2025-11-28T21:27:41.601219+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "fdb3f675-09bb-4c4a-8a6f-72e25762275a",
+    "question": "Which of the following statements about MyPlate is ?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "MyPlate recommendations need to be adjusted for individuals who exercise more than 30 minutes/day"
+      },
+      {
+        "id": "b",
+        "text": "MyPlate includes oils as a food group"
+      },
+      {
+        "id": "c",
+        "text": "The food groups displayed in MyPlate include grains, vegetables, fruits, protein foods, and dairy"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:41.72682+00:00",
+    "updated_at": "2025-11-28T21:27:41.72682+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "ac9bf12e-07d2-4cb9-a1fb-4290f79f465c",
+    "question": "What is the weight threshold by which athletes should avoid high-volume, high-intensity plyometric exercises?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "250 pounds"
+      },
+      {
+        "id": "b",
+        "text": "220 pounds"
+      },
+      {
+        "id": "c",
+        "text": "200 pounds"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:41.860081+00:00",
+    "updated_at": "2025-11-28T21:27:41.860081+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "61a5fa91-10a5-4eeb-99bb-b7a9ffd7c1c0",
+    "question": "Which intensity range is most appropriate for an athlete attempting to improve their multiple-effort event power?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "75-85%"
+      },
+      {
+        "id": "b",
+        "text": "90-95%"
+      },
+      {
+        "id": "c",
+        "text": "45-55%"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:41.988194+00:00",
+    "updated_at": "2025-11-28T21:27:41.988194+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "411b7c63-359a-489b-b73c-6842628c73a3",
+    "question": "When an older person starts to use less of their available ROM, what condition may occur?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Osteoarthritis"
+      },
+      {
+        "id": "b",
+        "text": "Osteoporosis"
+      },
+      {
+        "id": "c",
+        "text": "Fibrosis"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:42.119807+00:00",
+    "updated_at": "2025-11-28T21:27:42.119807+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "e244e8cc-f231-4b05-aec9-8a73653dc1dc",
+    "question": "Which of the following set and rep schemes would be recommended to train for hypertrophy?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "3 sets of 15 reps"
+      },
+      {
+        "id": "b",
+        "text": "4 sets of 8 reps"
+      },
+      {
+        "id": "c",
+        "text": "2 sets of 6 reps"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:42.256151+00:00",
+    "updated_at": "2025-11-28T21:27:42.256151+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "a1237ea2-62a5-4772-9eb5-fbd5aeb36863",
+    "question": "A strength and conditioning coach is designing a new gym. The coach orders two weightlifting racks that are 8 feet tall and 4 feet wide. The coach plans to primarily work with endurance athletes, who will be using low loads. How should the weightlifting racks be secured to increase safety?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "By buddy-bolting racks together"
+      },
+      {
+        "id": "b",
+        "text": "By bolting the rack to the wall"
+      },
+      {
+        "id": "c",
+        "text": "By bolting the rack to the floor"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:42.386691+00:00",
+    "updated_at": "2025-11-28T21:27:42.386691+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "4836cc63-b352-4767-a8c9-4eec5cb18a3e",
+    "question": "Which of the following is considered a nutrient-dense and calorie-dense food?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Avocado"
+      },
+      {
+        "id": "b",
+        "text": "Beans"
+      },
+      {
+        "id": "c",
+        "text": "White rice"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:42.526645+00:00",
+    "updated_at": "2025-11-28T21:27:42.526645+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "a59a90ef-2efc-43cc-867e-487c47543859",
+    "question": "Which of the following variables is factored into calculations for volume-load, but is not factored into calculations for repetition volume?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Velocity"
+      },
+      {
+        "id": "b",
+        "text": "Inertia"
+      },
+      {
+        "id": "c",
+        "text": "Displacement"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:42.659606+00:00",
+    "updated_at": "2025-11-28T21:27:42.659606+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "9ee10b0c-0e9f-4cba-bc0c-a64ad33b9536",
+    "question": "You have a client who is moving through a series of active movements focusing on achieving a full range of motion (ROM). You notice that she is also moving faster as time goes on. Which of the following does this describe?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Ballistic stretching"
+      },
+      {
+        "id": "b",
+        "text": "Dynamic stretching"
+      },
+      {
+        "id": "c",
+        "text": "PNF stretching"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:42.795274+00:00",
+    "updated_at": "2025-11-28T21:27:42.795274+00:00",
+    "date": "2025-12-04"
+  },
+  {
+    "id": "ff428357-a43e-4e2d-92cf-f9a10437837d",
+    "question": "What is sucrose?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Monosaccharide"
+      },
+      {
+        "id": "b",
+        "text": "Polysaccharide"
+      },
+      {
+        "id": "c",
+        "text": "Disaccharide"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:42.927382+00:00",
+    "updated_at": "2025-11-28T21:27:42.927382+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "479c91f5-560a-4b31-90e9-5b4d316e4628",
+    "question": "Which of the following is true of polypeptide hormones?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "They activate secondary messengers"
+      },
+      {
+        "id": "b",
+        "text": "They are fat-soluble"
+      },
+      {
+        "id": "c",
+        "text": "They can cross the cell membrane"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:43.069735+00:00",
+    "updated_at": "2025-11-28T21:27:43.069735+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "70d64b19-819e-4690-be11-2dffd879304b",
+    "question": "Which of the following is not absolutely necessary for a member of the strength and conditioning staff?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Exercise physiologist certification"
+      },
+      {
+        "id": "b",
+        "text": "Cardiopulmonary resuscitation certification"
+      },
+      {
+        "id": "c",
+        "text": "Automated external defibrillator certification"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:43.202181+00:00",
+    "updated_at": "2025-11-28T21:27:43.202181+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "505c42ae-47c3-4fb7-8519-d0e7a9c8546d",
+    "question": "How long does an activity last for the maximal power output to be measured as anaerobic capacity?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "30 to 90 seconds"
+      },
+      {
+        "id": "b",
+        "text": "Longer than 5 minutes"
+      },
+      {
+        "id": "c",
+        "text": "Fewer than 10 seconds"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:43.347273+00:00",
+    "updated_at": "2025-11-28T21:27:43.347273+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "6e1375f9-3a6a-4a7d-9286-31be9c861266",
+    "question": "An athlete performs a one-repetition maximum test on the barbell bench press. Their score is norm-referenced, and a z-score of 1.4 is reported.",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "The athlete's bench press one-repetition maximum is 40% greater than the mean athlete"
+      },
+      {
+        "id": "b",
+        "text": "The athlete's bench press one-repetition maximum is 1.4 standard deviations less than the mean athlete"
+      },
+      {
+        "id": "c",
+        "text": "The athlete's bench press one-repetition maximum is 1.4 standard deviations more than the mean athlete"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:43.47374+00:00",
+    "updated_at": "2025-11-28T21:27:43.47374+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "64369b7c-0321-4977-9676-dd9be9032b6b",
+    "question": "What is true of saturated fatty acids that is not true of unsaturated fatty acids?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "There are no double bonds in saturated fatty acids"
+      },
+      {
+        "id": "b",
+        "text": "Saturated fatty acids are fully saturated in nitrogen"
+      },
+      {
+        "id": "c",
+        "text": "There is a dietary requirement for saturated fatty acids"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:43.625545+00:00",
+    "updated_at": "2025-11-28T21:27:43.625545+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "69bae85b-e4ad-45d1-8e10-d9f841b55ac0",
+    "question": "Why is it important for athletes to manage their mental and physical energy levels?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Performance levels"
+      },
+      {
+        "id": "b",
+        "text": "Learning self-monitoring"
+      },
+      {
+        "id": "c",
+        "text": "Learning self-confidence"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:43.766744+00:00",
+    "updated_at": "2025-11-28T21:27:43.766744+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "19072410-c070-4421-acd4-9496009ffc29",
+    "question": "One of your athletes is rapidly losing weight while also being lethargic and having dry, yellowish skin. Which eating disorder may be suspected?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Binge-eating disorder"
+      },
+      {
+        "id": "b",
+        "text": "Bulimia nervosa"
+      },
+      {
+        "id": "c",
+        "text": "Anorexia nervosa"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:43.897431+00:00",
+    "updated_at": "2025-11-28T21:27:43.897431+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "276bd1ba-0757-4a46-bc4d-81b34b612f25",
+    "question": "What is the  space recommended per participant in a strength and conditioning facility?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "50 square feet"
+      },
+      {
+        "id": "b",
+        "text": "100 square feet"
+      },
+      {
+        "id": "c",
+        "text": "75 square feet"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:44.026244+00:00",
+    "updated_at": "2025-11-28T21:27:44.026244+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "d3b63eab-6874-4fb4-9466-f599f0bf1218",
+    "question": "When testing an athlete's one-repetition maximum for upper body, what is the suggested warm-up load (three to five reps) that should be added to the athlete's warm-up?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "10% to 15%"
+      },
+      {
+        "id": "b",
+        "text": "20% to 25%"
+      },
+      {
+        "id": "c",
+        "text": "5% to 10%"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:44.148605+00:00",
+    "updated_at": "2025-11-28T21:27:44.148605+00:00",
+    "date": "2025-12-05"
+  },
+  {
+    "id": "01e93836-8230-4285-a1c3-3c9251a75589",
+    "question": "An athlete wants to increase their ability to accelerate. Which of the following solutions will be most effective?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Increase strength-to-mass ratio"
+      },
+      {
+        "id": "b",
+        "text": "Induce muscle hypertrophy"
+      },
+      {
+        "id": "c",
+        "text": "Decrease myosin cross-bridge binding"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:44.28139+00:00",
+    "updated_at": "2025-11-28T21:27:44.28139+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "f40dd652-b5a8-4b5f-94ae-500e2f04f33a",
+    "question": "A client is performing the walking over and under dynamic stretch. How many hurdles are needed, and what specific heights should they be?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Two hurdles: one at hip level and one below hip level"
+      },
+      {
+        "id": "b",
+        "text": "Three hurdles: one at hip level, one above hip level, and one below hip level"
+      },
+      {
+        "id": "c",
+        "text": "Four hurdles: all at hip level"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:44.410277+00:00",
+    "updated_at": "2025-11-28T21:27:44.410277+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "cf8a8335-85f7-412b-92de-dda58b1e406d",
+    "question": "What are the basic building blocks of polypeptide hormones?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Amino acids"
+      },
+      {
+        "id": "b",
+        "text": "Glucose monomers"
+      },
+      {
+        "id": "c",
+        "text": "Fatty acids"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:44.540496+00:00",
+    "updated_at": "2025-11-28T21:27:44.540496+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "cdbf341f-1393-46ec-af2e-61b3f489327b",
+    "question": "Which of the following is the most appropriate shoulder abduction angle when performing the side quadriceps stretch?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "90 degrees"
+      },
+      {
+        "id": "b",
+        "text": "60 degrees"
+      },
+      {
+        "id": "c",
+        "text": "45 degrees"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:44.663571+00:00",
+    "updated_at": "2025-11-28T21:27:44.663571+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "f7634675-3b2f-4c2c-b896-1f692592b330",
+    "question": "Which of the following can create rigid compartments of fluid in the lower torso and air in the upper torso?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Valsalva maneuver"
+      },
+      {
+        "id": "b",
+        "text": "Blood flow restriction training"
+      },
+      {
+        "id": "c",
+        "text": "Increased respiratory tidal volume"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:44.82279+00:00",
+    "updated_at": "2025-11-28T21:27:44.82279+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "a599bac7-70bb-48ba-a41f-bc91446b4e26",
+    "question": "Which of the following is  considered a proprioceptor?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Joint receptors"
+      },
+      {
+        "id": "b",
+        "text": "Golgi tendon organs"
+      },
+      {
+        "id": "c",
+        "text": "Nociceptors"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:44.952399+00:00",
+    "updated_at": "2025-11-28T21:27:44.952399+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "8d7829ac-f1a7-497f-b5ef-ec58ff1e225c",
+    "question": "Which of the following emergencies should a strength and conditioning professional be most comfortable with triaging?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Concussion"
+      },
+      {
+        "id": "b",
+        "text": "Sciatica"
+      },
+      {
+        "id": "c",
+        "text": "Cardiac events"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:45.084852+00:00",
+    "updated_at": "2025-11-28T21:27:45.084852+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "0ffeefc4-b53f-4a04-825d-7bf722c64d78",
+    "question": "What is the protein that transports oxygen within a muscle cell?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Hemoglobin"
+      },
+      {
+        "id": "b",
+        "text": "Myoglobin"
+      },
+      {
+        "id": "c",
+        "text": "Mitochondria"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:45.209295+00:00",
+    "updated_at": "2025-11-28T21:27:45.209295+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "7783c5d6-2b18-4407-a063-6678081b23ca",
+    "question": "Which of the following best represents the overarching goal of a sprinting training program?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Improving stride length and stride frequency"
+      },
+      {
+        "id": "b",
+        "text": "Improving stride frequency and force production"
+      },
+      {
+        "id": "c",
+        "text": "Improving stride length and force production"
+      }
+    ],
+    "correct_id": "c",
+    "created_at": "2025-11-28T21:27:45.337604+00:00",
+    "updated_at": "2025-11-28T21:27:45.337604+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "145a59e1-423d-44e6-a650-dffc49a168c1",
+    "question": "Which of the following training ages would result in a client being classified as a moderately resistance-trained individual?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "2 years"
+      },
+      {
+        "id": "b",
+        "text": "3 months"
+      },
+      {
+        "id": "c",
+        "text": "1 year"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:45.46328+00:00",
+    "updated_at": "2025-11-28T21:27:45.46328+00:00",
+    "date": "2025-12-06"
+  },
+  {
+    "id": "601fd47d-1da1-46cd-a25e-ece04fe81aab",
+    "question": "Your client is doing a great job as he learns the form and posture during a barbell deadlift, but he still keeps making small mistakes. After one of his sets, you provide him with form corrections in a positive way.",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Positive reinforcement"
+      },
+      {
+        "id": "b",
+        "text": "Augmented feedback"
+      },
+      {
+        "id": "c",
+        "text": "External feedback"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:45.851028+00:00",
+    "updated_at": "2025-11-28T21:27:45.851028+00:00",
+    "date": "2025-12-07"
+  },
+  {
+    "id": "a8842b17-f130-44de-b385-70cfc8aa01fb",
+    "question": "A recruitment coach is conducting athletic testing for athletes interested in trying out for a traveling volleyball team. Which of the following could help determine which tests would help identify athletes with the potential to excel in volleyball?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Construct validity"
+      },
+      {
+        "id": "b",
+        "text": "Concurrent validity"
+      },
+      {
+        "id": "c",
+        "text": "Predictive validity"
+      }
+    ],
+    "correct_id": "b",
+    "created_at": "2025-11-28T21:27:45.979166+00:00",
+    "updated_at": "2025-11-28T21:27:45.979166+00:00",
+    "date": "2025-12-07"
+  },
+  {
+    "id": "2b5f30fb-5e39-4549-97e4-ea35aeb35ef7",
+    "question": "You hear a rumor that your athlete is suffering from bulimia nervosa. What is the  thing that you should do?",
+    "options_json": [
+      {
+        "id": "a",
+        "text": "Become familiar with signs and symptoms"
+      },
+      {
+        "id": "b",
+        "text": "Assist the athlete in attaining the proper diagnosis from a medical professional"
+      },
+      {
+        "id": "c",
+        "text": "Contact the athlete's PCP immediately to relay the information"
+      }
+    ],
+    "correct_id": "a",
+    "created_at": "2025-11-28T21:27:46.117544+00:00",
+    "updated_at": "2025-11-28T21:27:46.117544+00:00",
+    "date": "2025-12-07"
+  }
+]
