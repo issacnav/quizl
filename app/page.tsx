@@ -534,10 +534,10 @@ export default function DailyChallenge() {
            >
               <div className="text-center mb-8">
                  <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-500 mb-4 border border-amber-500/20">
-                    <Archive className="w-8 h-8" />
+                    <RotateCcw className="w-8 h-8" />
                  </div>
-                 <h2 className="text-2xl font-bold text-white mb-2">The Vault</h2>
-                 <p className="text-zinc-400 text-sm">Access the archive of past clinical questions.</p>
+                 <h2 className="text-2xl font-bold text-white mb-2">Practice Mode</h2>
+                 <p className="text-zinc-400 text-sm">Practice with past clinical questions.</p>
               </div>
 
               <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6 space-y-8 backdrop-blur-sm">
@@ -589,7 +589,7 @@ export default function DailyChallenge() {
                        onClick={startPractice}
                        className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold h-14 text-lg shadow-[0_0_20px_rgba(245,158,11,0.2)] hover:shadow-[0_0_30px_rgba(245,158,11,0.4)] transition-all"
                     >
-                       Enter The Vault
+                       Start Practice
                     </Button>
                     <Button 
                        variant="ghost" 
@@ -695,61 +695,51 @@ export default function DailyChallenge() {
                />
             </div>
 
-            <div className="p-4 sm:p-6 md:p-8 bg-zinc-900/50 border border-white/5 rounded-2xl mb-6 sm:mb-8 relative z-10 backdrop-blur-sm">
-                <div className="flex justify-center gap-6 sm:gap-10">
-                  <div className="text-center">
-                    <div className="text-xs sm:text-sm text-zinc-500 uppercase tracking-widest mb-1">Today</div>
-                    <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-white tracking-tighter">
-                        {Math.floor(score / 1000)}
-                    </div>
-                  </div>
-                  <div className="w-px bg-white/10" />
-                  <div className="text-center">
-                    <div className="text-xs sm:text-sm text-yellow-500/80 uppercase tracking-widest mb-1">Career Total</div>
-                    <div className="text-3xl sm:text-4xl md:text-5xl font-mono font-bold text-yellow-400 tracking-tighter">
-                        {Math.floor(totalScore / 1000)}
-                    </div>
-                  </div>
+            <div className="grid grid-cols-2 gap-px bg-white/10 rounded-2xl overflow-hidden border border-white/5 mb-8 max-w-xs sm:max-w-sm md:max-w-md mx-auto w-full">
+                <div className="bg-zinc-900/50 p-4 flex flex-col items-center">
+                  <span className="text-[10px] uppercase tracking-widest text-zinc-500 font-bold">Today</span>
+                  <span className="text-3xl font-mono font-bold text-white mt-1">{Math.floor(score / 1000)}</span>
+                </div>
+                <div className="bg-zinc-900/50 p-4 flex flex-col items-center relative">
+                  <div className="absolute inset-0 bg-yellow-500/5 pointer-events-none" /> 
+                  <span className="text-[10px] uppercase tracking-widest text-yellow-600 font-bold">Career</span>
+                  <span className="text-3xl font-mono font-bold text-yellow-500 mt-1">{Math.floor(totalScore / 1000)}</span>
                 </div>
             </div>
 
-            <div className="flex flex-col gap-3 max-w-xs sm:max-w-sm md:max-w-md mx-auto w-full">
+            <div className="flex flex-col gap-3 mb-8 max-w-xs sm:max-w-sm md:max-w-md mx-auto w-full">
+                
                 {!currentUser ? (
-                  <div className="space-y-3 w-full">
-                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl text-center">
-                      <p className="text-xs text-blue-200 mb-3 leading-relaxed">
-                        Sign in to save your <strong>{Math.floor(totalScore/1000)} career points</strong> to the leaderboard.
-                      </p>
-                      <Button 
-                        onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } })}
-                        className="w-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold h-9"
-                      >
-                        Claim Points & Sign Up
-                      </Button>
+                  <div className="flex flex-col gap-3 w-full">
+                    <div className="text-center px-4">
+                        <p className="text-xs text-zinc-400">
+                          Don&apos;t lose your progress. <span className="text-zinc-300">Sign up to claim these {Math.floor(totalScore/1000)} points.</span>
+                        </p>
                     </div>
+
+                    <Button 
+                      onClick={() => supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.href } })}
+                      className="w-full h-11 bg-blue-600 hover:bg-blue-500 text-white font-medium shadow-[0_0_20px_-5px_rgba(37,99,235,0.4)] transition-all"
+                    >
+                      Claim Points & Sign Up
+                    </Button>
                     
                     <Link href="/leaderboard" className="w-full">
-                      <Button variant="secondary" className="w-full bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs h-9">
+                      <Button variant="ghost" className="w-full h-9 text-xs text-zinc-500 hover:text-white hover:bg-white/5">
+                        <Trophy className="w-3 h-3 mr-2" />
                         View Leaderboard
                       </Button>
                     </Link>
-                    
-                    {/* Vault Entry Point */}
-                    <Button 
-                       className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs h-10 mt-2 shadow-lg shadow-amber-900/20"
-                       onClick={() => setView("PRACTICE_CONFIG")}
-                    >
-                       <Archive className="w-4 h-4 mr-2" />
-                       Enter The Vault
-                    </Button>
                   </div>
                 ) : (
                   <div className="flex flex-col gap-3 w-full">
                     <div className="text-center text-xs text-green-400 mb-1 flex items-center justify-center gap-2">
                        <Check className="w-3 h-3" /> Score Saved to Profile
                     </div>
+
                     <Link href="/leaderboard" className="w-full">
-                      <Button className="w-full bg-white text-black hover:bg-zinc-200 font-medium">
+                      <Button className="w-full bg-white text-black hover:bg-zinc-200 font-bold h-10 shadow-lg shadow-white/5">
+                        <Trophy className="w-4 h-4 mr-2" />
                         View Global Rankings
                       </Button>
                     </Link>
@@ -757,17 +747,36 @@ export default function DailyChallenge() {
                     <Button variant="ghost" className="text-zinc-500 text-xs" disabled>
                         Next Quiz in: {24 - new Date().getHours()}h {60 - new Date().getMinutes()}m
                     </Button>
-
-                    {/* Vault Entry Point */}
-                    <Button 
-                       className="w-full bg-amber-500 hover:bg-amber-600 text-black font-bold text-xs h-10 mt-2 shadow-lg shadow-amber-900/20"
-                       onClick={() => setView("PRACTICE_CONFIG")}
-                    >
-                       <Archive className="w-4 h-4 mr-2" />
-                       Enter The Vault
-                    </Button>
                   </div>
                 )}
+
+                {/* Practice Mode - Separated & Styled as a "Tool" */}
+                <div className="relative mb-4 mt-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-white/10" />
+                  </div>
+                  <div className="relative flex justify-center text-[10px] uppercase tracking-widest font-medium">
+                    <span className="bg-black px-2 text-zinc-500">OR</span>
+                  </div>
+                </div>
+
+                <div 
+                  onClick={() => setView("PRACTICE_CONFIG")}
+                  className="group relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900/30 p-4 hover:border-white/20 hover:bg-zinc-900/50 transition-all cursor-pointer"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 rounded-full bg-orange-500/10 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
+                        <RotateCcw className="w-4 h-4" />
+                      </div>
+                      <div className="text-left">
+                        <h3 className="text-sm font-medium text-white group-hover:text-orange-400 transition-colors">Practice Mode</h3>
+                        <p className="text-[10px] text-zinc-500">Unlimited questions. No pressure.</p>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-zinc-600 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                  </div>
+                </div>
             </div>
           </motion.div>
         )}
