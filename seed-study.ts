@@ -6,8 +6,8 @@ import path from 'path';
 // Load environment variables
 config({ path: '.env.local' });
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ytdmxhpxceywuaudguti.supabase.co';
-const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl0ZG14aHB4Y2V5d3VhdWRndXRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM4MjA2MDAsImV4cCI6MjA3OTM5NjYwMH0.DF323J_0OhS6pad5jgXgtdHVJ1BcvaJre894-r5AMQU';
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://lwblnkrbqfvzselxbzjv.supabase.co';
+const SUPABASE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx3Ymxua3JicWZ2enNlbHhiemp2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNDE0ODEsImV4cCI6MjA5MDgxNzQ4MX0.Zd_IzeYtxgy4IZayG_YAhPIc2HAQ831qIKdNqXjw-GU';
 
 if (!SUPABASE_URL || !SUPABASE_KEY) {
   console.error("Missing Supabase credentials");
